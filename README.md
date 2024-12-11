@@ -1,6 +1,6 @@
 # CppStu
 唐老师的C++深度解析课程
-## lesson02 
+## lesson03 
 ### C语言中的const
 - const 修饰的变量是只读的，本质还是变量
 - const 修饰的局部变量在栈上分配空间
@@ -35,3 +35,53 @@
 - <font color=Teal>C++中的const是一个真正意义上的常量</font>
 - <font color=Teal>C++编译器可能会为const常量分配空间</font>
 - <font color=Teal>C++完全兼容C语言中const常量的语法特性</font>
+
+## lesson04 布尔类型和引用
+### C++中的布尔类型
+- C++在C语言的几倍类型系统之上增加了bool
+- C++中的bool可取的值只有true和false
+- 理论上bool只占用一个字节
+> <font color=Chocolate>注意：</font>
+> <font color=Chocolate>true 代表真值，编译器内部用1来表示</font>
+> <font color=Chocolate>false代表非真值，编译器内部用0来表示</font>
+
+### 布尔类型的值
+- bool类型只有true(非0)和false(0)两个值
+- C++编译器会将非0值转换为true,0值转换为false
+
+### 布尔类型是C++中的基本数据类型
+- 可以定义bool类型的全局变量
+- 可以定义bool类型的常量
+- 可以定义bool类型的指针
+- 可以定义bool类型的数组
+
+### C++对三目运算符进行了升级
+``` c++
+int a = 1;
+int b = 2;
+(a<b?a:b) = 3;
+printf("a = %d, b = %d\n", a, b);
+```
+- C语言中的三目运算符返回的是变量值 不能作为左值使用
+- C++中的三目运算符可直接返回变量本身
+	- 即可作为右值使用，又可作为左值使用
+	- <font color=Chocolate>注意：三目运算符可能返回的值中如果有一个是常量值，则不能作为左值使用</font>
+
+### C++中的引用
+- 变量名回顾
+	- 变量是一段实际连续存储空间的别名
+	- 程序中通过变量来申请并命名存储空间
+	- 通过变量的名字可以使用存储空间
+- 在C++中新增加了引用的概念
+	- 引用可以看作一个已定义变量的别名
+	- 引用的语法：`Type& name = var`
+- C++对三目运算符做了什么？
+	- 当三目运算符的可能返回都是变量时，返回的是变量引用
+	- 当三目运算符的可能返回中有常量时，返回的是值
+
+### 小结
+- <font color=Teal>bool类型是C++新增加的基础类型</font>
+- <font color=Teal>bool类型的值只能是true和false</font>
+- <font color=Teal>C++中的三目运算符可作为左值使用</font>
+- <font color=Teal>C++中的引用可以看作变量的别名来使用</font>
+- <font color=Teal>三目运算符的可能返回都是变量时，返回的是引用</font>
