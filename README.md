@@ -1,5 +1,8 @@
 # CppStu
 唐老师的C++深度解析课程
+## 运行环境
+`vs2019`
+
 ## lesson03 
 ### C语言中的const
 - const 修饰的变量是只读的，本质还是变量
@@ -8,7 +11,8 @@
 - const 只在编译期有用，在运行期无用
 > const修饰的变量不是真的常量，它只是告诉编译器该变量不能出现在赋值符号的左边。
 > C语言中的const使得变量具有只读属性
-> <font color=Chocolate>const将具有全局生命周期的变量存储于只读存储区 const不能定义真正意义上的常量</font>
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**const将具有全局生命周期的变量存储于只读存储区 const不能定义真正意义上的常量**</font>
 
 ### C++中的const(C++在C的基础上对const进行了进化处理)
 - 当碰见const声明时在符号表中放入从常量
@@ -16,7 +20,8 @@
 - 编译过程中若发现下述情况则给对应的常量分配存储空间
 	- 对const常量使用了extern
 	- 对const常量使用&操作符
-> <font color=Chocolate>注意：C++编译器虽然可能为const常量分配空间，但不会使用其存储空间的值。</font>
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**注意：C++编译器虽然可能为const常量分配空间，但不会使用其存储空间的值。**</font>
 
 - C语言中的const变量
 	- C语言中const变量是只读变量，会分配存储空间
@@ -41,9 +46,9 @@
 - C++在C语言的几倍类型系统之上增加了bool
 - C++中的bool可取的值只有true和false
 - 理论上bool只占用一个字节
-> <font color=Chocolate>注意：</font>
-> <font color=Chocolate>true 代表真值，编译器内部用1来表示</font>
-> <font color=Chocolate>false代表非真值，编译器内部用0来表示</font>
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**true 代表真值，编译器内部用1来表示**</font>
+> <font color=Chocolate>**false代表非真值，编译器内部用0来表示**</font>
 
 ### 布尔类型的值
 - bool类型只有true(非0)和false(0)两个值
@@ -65,7 +70,7 @@ printf("a = %d, b = %d\n", a, b);
 - C语言中的三目运算符返回的是变量值 不能作为左值使用
 - C++中的三目运算符可直接返回变量本身
 	- 即可作为右值使用，又可作为左值使用
-	- <font color=Chocolate>注意：三目运算符可能返回的值中如果有一个是常量值，则不能作为左值使用</font>
+	- <font color=Chocolate>**注意：三目运算符可能返回的值中如果有一个是常量值，则不能作为左值使用**</font>
 
 ### C++中的引用
 - 变量名回顾
@@ -85,3 +90,33 @@ printf("a = %d, b = %d\n", a, b);
 - <font color=Teal>C++中的三目运算符可作为左值使用</font>
 - <font color=Teal>C++中的引用可以看作变量的别名来使用</font>
 - <font color=Teal>三目运算符的可能返回都是变量时，返回的是引用</font>
+
+## lesson05 引用的本质分析
+### 引用的意义
+- 用用作为变量别名而存在，因此在一些场合可以代替指针
+- 引用相对于指针来说具有更好的可读性和实用性
+### 特殊的引用
+- const引用
+	- 在C++中可以声明const引用
+	- const Type& name = var;
+	- const引用让变量拥有只读属性
+- 当使用常量对const引用进行初始化时，C++编译器会为常量值分配空间，并将引用名作为这段空间的别名<font color=SkyBlue>[使用常量对const引用初始化后将生成一个只读变量]</font>
+- 引用的本质
+	- 引用在C++中的内部实现是一个指针常量
+| 引用 | 指针常量 |
+| ----------- | ----------- |
+| Type& name; | Type\* const name; |
+
+ <font color=Chocolate>**注意：**</font>
+ <font color=Chocolate>**C++编译器在编译过程中用指针常量作为引用的内部实现，因此引用所占用的空间大小与指针相同。**</font>
+ <font color=Chocolate>**从使用的角度，引用只是一个别名，C++为了实用性而隐藏了引用的存储空间这一细节。**</font>
+- C++中的引用旨在大多数的情况下代替指针
+	- 功能性：可以满足多数需要使用指针的场合
+	- 安全性：可以避开由于指针操作不当而带来的内存错误
+	- 操作性：简单易用，又不失功能强大
+### 小结
+- <font color=Teal>引用作为变量别名而存在旨在代替指针</font>
+- <font color=Teal>const引用可以使得变量具有只读属性</font>
+- <font color=Teal>引用在编译器内部使用指针常量实现</font>
+- <font color=Teal>引用的最终本质为指针</font>
+- <font color=Teal>引用可以尽可能的避开内存错误</font>
