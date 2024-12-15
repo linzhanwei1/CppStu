@@ -272,7 +272,7 @@ extern "C" {
 > <font color=Chocolate>**注意：**</font>
 > <font color=Chocolate>**C++编译器不能以C的方式编译重载函数**</font>
 > <font color=Chocolate>**编译方式决定函数名被编译后的目标名**</font>
-	
+
 	- <font color=Chocolate>**C++编译方式将函数名和参数列表编译成目标名**</font>
 	- <font color=Chocolate>**C编译方式只将函数名作为目标名进行编译**</font>
 
@@ -281,3 +281,97 @@ extern "C" {
 - <font color=Teal>函数重载通过函数参数列表区分不同的同名函数</font>
 - <font color=Teal><font color=CornflowerBlue>**extern**</font>关键字能够实现C和C++的相互调用</font>
 - <font color=Teal>编译方式决定符号表中的函数名的最终目标名</font>
+## lesson10 C++中的新成员
+### C++中的动态内存分配
+- C++中通过<font color=CornflowerBlue>**new**</font>关键字进行动态内存申请
+- C++中的动态内存申请是基于类型进行的
+- <font color=CornflowerBlue>**delete**</font>关键字用于内存释放
+
+| 变量申请 | 数组申请 |
+| ----------- | ----------- |
+| Type\* pointer = new Type; | Type\* pointer = new Type[N]; |
+| delete pointer; | delete[] pointer |
+
+### 动态内存分配
+- <font color=CornflowerBlue>**new**</font>关键字与<font color=CornflowerBlue>**malloc**</font>函数的区别
+	- <font color=CornflowerBlue>**new**</font>关键字是C++的一部分
+	- <font color=Chocolate>**malloc**</font>是由C库提供的函数
+	- <font color=CornflowerBlue>**new**</font>以具体类型为单位进行内存分配
+	- <font color=Chocolate>**malloc**</font>以字节为单位进行内存分配
+	- <font color=CornflowerBlue>**new**</font>在申请单个类型变量时可进行初始化
+	- <font color=Chocolate>**malloc**</font>不具备内存初始化的特性
+### C++中的命名空间
+- 在C语言中只有一个全局作用域
+	- C语言中所有的全局标识符共享同一个作用域
+	- 标识符之间可能发生冲突
+- C++中提出了命名空间的概念
+	- 命名空间将全局作用域分成不同的部分
+	- 不同命名空间中的标识符可以同名而不会发生冲突
+	- 命名空间可以相互嵌套
+	- 全局作用域也叫默认命名空间
+- C++命名空间的定义
+```c++
+namespace Name {
+	namespace Internal {
+		/* ... */
+	}
+	/* ... */
+}
+```
+- C++命名空间的使用：
+	- 使用整个命名空间：using namespace name;
+	- 使用命名空间中的变量：using name::variable;
+	- 使用默认命名空间中的变量：::variable
+### 小结
+- <font color=Teal>C++中内置了动态内存分配的专用关键字</font>
+- <font color=Teal>C++中的动态内存分配可以同时进行初始化</font>
+- <font color=Teal>C++中的动态内存分配是基于类型进行的</font>
+- <font color=Teal>C++中命名空间概念用于解决名称冲突问题</font>
+
+## lesson11 新型的类型转换
+### C方式的强制类型转换
+- (Type)(Expression)
+- Type(Expression)
+### C方式强制类型转换存在的问题
+- 过于粗暴
+	- 任意类型直接都可以进行转换，编译器很难判断其正确性
+- 难于定位
+	- 在源码中无法快速定位所有使用强制类型转换的语句
+### 新式类型转换
+- C++将强制类型转换分为4种不同的类型
+| static_cast | const_cast |
+| ----------- | ----------- |
+| dynamic_cast | reinterpret_cast |
+> 用法：xxx_cast<Type>(Expression)
+
+- static_cast强制类型转换
+	- 用于基本类型间的转换
+	- <font color=Chocolate>**不能**</font>用于基本类型指针间的转换
+	- 用于有继承关系类对象之间的转换和类指针之间的转换
+	
+- const_cast强制类型转换
+	- 用于去除变量的只读属性
+	- 强制转换的目标类型必须是指针或引用
+	
+- reinterpret_cast强制类型转换
+	- 用于指针类型间的强制转换
+	- 用于整数和指针类型间的强制转换
+	
+- dynamic_cast强制类型转换
+	- 用于有继承关系的类指针间的转换
+	
+	- 用于有交叉关系的类指针间的转换
+	
+	- 具有类型检查的功能
+	
+	- 需要虚函数的支持
+	
+### 小结
+- <font color=Teal>C方式的强制类型转换</font>
+	- <font color=Teal>过于粗暴</font>
+	- <font color=Teal>潜在的问题不易被发现</font>
+	- <font color=Teal>不易在代码中定位</font>
+- <font color=Teal>新式类型转换以C++关键字的方式出现</font>
+	- <font color=Teal>编译器能够帮助检查潜在的问题</font>
+	- <font color=Teal>非常方便在代码中定位</font>
+	- <font color=Teal>支持动态类型识别(dynamic_cast)</font>
