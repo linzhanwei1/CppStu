@@ -103,6 +103,7 @@ printf("a = %d, b = %d\n", a, b);
 - 当使用常量对const引用进行初始化时，C++编译器会为常量值分配空间，并将引用名作为这段空间的别名<font color=SkyBlue>[使用常量对const引用初始化后将生成一个只读变量]</font>
 - 引用的本质
 	- 引用在C++中的内部实现是一个指针常量
+
 | 引用 | 指针常量 |
 | ----------- | ----------- |
 | Type& name; | Type\* const name; |
@@ -120,3 +121,163 @@ printf("a = %d, b = %d\n", a, b);
 - <font color=Teal>引用在编译器内部使用指针常量实现</font>
 - <font color=Teal>引用的最终本质为指针</font>
 - <font color=Teal>引用可以尽可能的避开内存错误</font>
+
+## lesson06 内联函数分析
+- C++中的const常量可以替代宏常数定义，如：
+
+| 常量 | 宏定义 |
+| ----------- | ----------- |
+| const int A = 3; | #define A 3 |
+
+- 内联函数
+	- C++中推荐使用内联函数替代宏代码片段
+	- C++中使用inline关键字声明内联函数
+``` c++
+inline int func(int a, int b) {
+	return a < b ? a : b;
+}
+```
+<font color=Chocolate>**内联函数声明时inline关键字必须和函数定义结合在一起，否则编译器会直接忽略内联请求**</font>
+- C++ 编译器可以将一个函数进行内联编译
+- 被C++编译器内联编译的函数叫做内联函数
+- C++ 编译器直接将函数体插入函数调用的地方
+- 内联函数没有普通函数调用时的额外开销(压栈，跳转，返回)
+- C++ 编译器不一定满足函数的内联请求
+### 内联函数
+- 内联函数具有普通函数的特征(参数检查，返回类型等)
+- 函数的内联请求可能被编译器拒绝
+- 函数被内联编译后，函数体直接扩展到调用的地方
+> <font color=Chocolate>**宏代码片段由预处理器处理，进行简单的文本替换，没有任何编译过程，因此可能出现副作用**</font>
+
+- 现代C++编译器能够进行编译优化，一些函数即使没有inline声明，也可能被内联编译
+- 一些现代C++编译器提供了扩展语法，能够对函数进行强制内联如：
+	- g++:__attribute__((always_inline))属性
+	- MSVC:__forceinline
+
+### 注意事项
+- C++中Inline内联编译的限制：
+	- <font color=Chocolate>**不能存在任何形式的循环语句**</font>
+	- <font color=Chocolate>**不能存在过多的条件判断语句**</font>
+	- <font color=Chocolate>**函数体不能过于庞大**</font>
+	- <font color=Chocolate>**不能对函数进行取址操作**</font>
+	- <font color=Chocolate>**函数内联声明必须在调用语句之前**</font>
+### 小结
+- <font color=Teal>C++中可以通过inline声明内联函数</font>
+- <font color=Teal>编译器直接将内联函数体扩展到函数调用的地方</font>
+- <font color=Teal>inline只是一种请求，编译器不一定允许这种请求</font>
+- <font color=Teal>内联函数省去了函数调用时压栈，跳转和返回的开销</font>
+
+## lesson07 函数参数的扩展
+### 函数参数的默认值
+- C++中可以在函数声明时为参数提供一个默认值
+- 当函数调用时没有提供参数的值，则使用默认值
+``` c++
+int mul(int x = 0);
+int main(int argc, char *argv[]) {
+	printf("%d\n", mul());	// mul(0)
+	return 0;
+}
+int mul(int x) {
+	return x * x;
+}
+```
+### 函数参数的默认值
+- 参数的默认值必须在函数声明中指定
+### 函数参数的默认值
+- 函数默认参数的规则
+	- 参数的默认值必须从右向左提供
+	- 函数调用时使用了默认值，则后续参数必须使用默认值
+### 函数的占位参数
+- 在C++中可以为函数提供占位参数
+	- 占位参数只有参数类型声明，而没有参数名声明
+	- 一般情况下，在函数体内部无法使用占位参数
+	- 占位参数与默认参数结合起来使用
+	- 兼容C语言程序中可能出现的不规范写法
+### 小结
+- <font color=Teal>C++中支持函数参数的默认值</font>
+- <font color=Teal>如果函数调用时没有提供参数值，则使用默认值</font>
+- <font color=Teal>参数的默认值必须从右向左提供</font>
+- <font color=Teal>函数调用时使用了默认值，则后续参数必须使用默认值</font>
+- <font color=Teal>C++中支持占位参数，用于兼容C语言中的不规范写法</font>
+
+## lesson08 函数重载分析(上)
+### 重载(Overload)
+- 同一个标识符在不同的上下文有不同的意义
+### C++中的函数重载
+- 用一个函数名定义不同的函数
+- 当函数名和不同的参数搭配时函数的含义不同
+- 函数重载至少满足下面的一个条件：
+	- 参数个数不同
+	- 参数类型不同
+	- 参数顺序不同
+### 编译器调用重载函数的准则
+- 将所有同名函数作为候选者
+- 尝试寻找可行的候选函数
+	- 精确匹配实参
+	- 通过默认参数能够匹配实参
+	- 通过默认类型转换匹配实参
+- 匹配失败
+	- 最终寻找到的候选函数不唯一，则出现二义性，编译失败
+	- 无法匹配所有候选者，函数未定义，编译失败
+### 函数重载的注意事项
+- 重载函数在本质上是相互独立的不同函数
+- 重载函数的函数类型不同
+- 函数返回值不能作为函数重载的依据
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**函数重载是由函数名和参数列表决定的**</font>
+
+### 小结
+- <font color=Teal>函数重载是C++中引入的概念</font>
+- <font color=Teal>函数重载用于模拟自然语言中的词汇搭配</font>
+- <font color=Teal>函数重载使得C++具有更丰富的语义表达能力</font>
+- <font color=Teal>函数重载的本质为相互独立的不同函数</font>
+- <font color=Teal>C++中通过函数名和函数参数确定函数调用</font>
+## lesson08 函数重载分析(下)
+### 重载与指针
+- 函数重载遇上函数指针
+	- 将重载函数名赋值给函数指针时
+		1. 根据重载规则挑选与函数指针参数列表一致的候选者
+		2. 严格匹配候选者的函数类型与函数指针的函数类型. 
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**函数重载必然发生在同一个作用域中**</font>
+> 编译器需要用参数列表或函数类型进行函数选择
+> 无法直接通过函数名得到重载函数的入口地址
+
+### C++和C相互调用
+- 实际工程中C++和C代码相互调用是不可避免的
+- C++编译器能够兼容C语言的编译方式
+- C++编译器会优先使用C++编译的方式
+- <font color=CornflowerBlue>**extern**</font>关键字能强制让C++编译器进行C方式的编译
+``` c++
+extern "C"
+{
+	// do C-style compilation here
+}
+```
+### 如何保证一段C代码只会以C的方式被编译？
+- __cplusplus是C++编译器内置的标准宏定义
+- __cplusplus的意义
+	- 确保C代码以统一的C方式被编译成目标文件
+``` c++
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// C-Style Compilation
+
+#ifdef __cplusplus
+}
+#endif
+```
+> <font color=Chocolate>**注意：**</font>
+> <font color=Chocolate>**C++编译器不能以C的方式编译重载函数**</font>
+> <font color=Chocolate>**编译方式决定函数名被编译后的目标名**</font>
+	
+	- <font color=Chocolate>**C++编译方式将函数名和参数列表编译成目标名**</font>
+	- <font color=Chocolate>**C编译方式只将函数名作为目标名进行编译**</font>
+
+### 小结
+- <font color=Teal>函数重载是C++对C的一个重要升级</font>
+- <font color=Teal>函数重载通过函数参数列表区分不同的同名函数</font>
+- <font color=Teal><font color=CornflowerBlue>**extern**</font>关键字能够实现C和C++的相互调用</font>
+- <font color=Teal>编译方式决定符号表中的函数名的最终目标名</font>
