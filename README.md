@@ -375,3 +375,125 @@ namespace Name {
 	- <font color=Teal>编译器能够帮助检查潜在的问题</font>
 	- <font color=Teal>非常方便在代码中定位</font>
 	- <font color=Teal>支持动态类型识别(dynamic_cast)</font>
+
+## lesson12 经典问题解析一
+### <font color=CornflowerBlue>**const**</font>常量的判别准则
+- 只有用字面量初始化的<font color=CornflowerBlue>**const**</font>常量才会进入符号表
+- 使用其它变量初始化的<font color=CornflowerBlue>**const**</font>常量仍然是只读变量
+- 被<font color=CornflowerBlue>**volatile**</font>修饰的<font color=CornflowerBlue>**const**</font>常量不会进去符号表
+- 在<font color=Chocolate>**编译期间不能直接确定初始值**</font>的<font color=CornflowerBlue>**const**</font>标识符，否被作为只读变量处理。
+### const引用的类型与初始化变量的类型
+- 相同：初始化变量成为只读变量
+- 不同：生成一个新的只读变量
+### 指针是一个变量
+- 值为一个内存地址，不需要初始化，可以保存不同的地址
+- 通过指针可以访问对应内存地址中的值
+- 指针可以被<font color=CornflowerBlue>**const**</font>修饰成为常量或者只读变量
+### 引用只是一个变量的新名字
+- 对引用的操作(赋值，取地址等)都会传递到代表的变量上
+- <font color=CornflowerBlue>**const**</font>引用使其代表的变量具有只读属性
+- 引用必须在定义时初始化，之后无法代表其它变量
+### 从使用C++语言的角度看
+- 引用与指针没有任何关系
+- 引用是变量的新名字，操作引用就是操作对应的变量
+### 从C++编译器的角度来看
+- 为了支持新概念，“引用”必须要有一个有效的解决方案
+- 在编译器内部，使用指针常量来实现“引用”
+- 因此“引用”在定义时必须初始化
+
+> 实例二[c++不支持引用数组]：
+```c++
+#include <stdio.h>
+
+int a = 1;
+struct SV {
+	int& x;
+	int& y;
+	int& z;
+};
+
+int main(int argc, char* argv[]) {
+	int b = 2;
+	int* pc = new int(3);
+	SV sv = {a, b, *pc};
+    // 数组的每个元素的地址是连续的。但实际值array[0]:全局静态存储区array[1]:栈区array[2]:堆区
+	int& array[] = { a, b, *pc };	
+
+	printf("&sv.x = %p\n", &sv.x);
+	printf("&sv.y = %p\n", &sv.y);
+	printf("&sv.z = %p\n", &sv.z);
+
+	delete pc;
+	pc = nullptr;
+	return 0;
+```
+## lesson15 类于封装的概念
+### 类成员的作用域
+- 类成员的作用域都只在类的内部，外部无法直接访问
+- 成员函数可以直接访问成员变量和调用成员函数
+- 类的外部可以通过类变量访问public成员
+- 类成员的作用域与访问级别没有关系
+> <font color=Chocolate>**C++中用struct定义的类中所有成员默认为public**</font>
+
+### 小结
+- <font color=Teal>类通常可以分为使用方式和内部细节两个部分</font>
+- <font color=Teal>类的封装机制使得使用方式和内部细节相分离</font>
+- <font color=Teal>C++中通过定义类成员的访问级别实现封装机制</font>
+- <font color=Teal>public成员可以在类的内部和外界访问和调用</font>
+- <font color=Teal>private成员只能在类的内部被访问和调用</font>
+
+## lesson16 类的真正形态
+### 类的关键字
+- <font color=CornflowerBlue>**struct**</font>在C语言中已经有了自己的含义，必须继续兼容
+- 在C++中提供了新的关键字<font color=CornflowerBlue>**class**</font>用于类定义
+- <font color=CornflowerBlue>**struct**</font>和<font color=CornflowerBlue>**class**</font>的用法是完全相同的但有一定区别
+- 在用<font color=CornflowerBlue>**struct**</font>定义类时，所有成员的默认访问级别为<font color=Chocolate>**public**</font>
+- 在用<font color=CornflowerBlue>**class**</font>定义类时，所有成员的默认访问级别为<font color=Chocolate>**private**</font>
+### 需求：开发一个用于四则运算的类
+- 提供setOperator函数设置运算类型
+- 提供setParameter函数设置运算参数
+- 提供result函数进行运算
+	- 其返回值表示运算的合法性
+	- 通过引用参数返回结果
+### 小结
+- <font color=Teal>C++引进了新的关键字class用于定义类</font>
+- <font color=Teal>struct和class的区别在于默认访问级别的不同</font>
+- <font color=Teal>C++中的类支持声明和实现的分离</font>
+	- <font color=Teal>在头文件中声明类</font>
+	- <font color=Teal>在源文件中实现类</font>
+## lesson17 对象的构造[上]
+### 对象的初始化
+- 从程序设计的角度，对象只是变量，因此：
+	- 在栈上创建对象时，成员变量初始为随机值
+	- 在堆上创建对象时，成员变量初始为随机值
+	- 在静态存储区(全局或static)创建对象时，成员变量初始为0值
+### C++中可以定义与类名相同的特殊成员函数
+- 这种特殊的成员函数叫做构造函数
+	- 构造没有任何返回类型的声明
+	- 构造函数在对象定义时自动被调用
+### 小结
+- <font color=Teal>每个对象在使用之前都应该初始化</font>
+- <font color=Teal>类的构造函数用于对象的初始化</font>
+- <font color=Teal>构造函数与类同名并且没有返回值</font>
+- <font color=Teal>构造函数在对象定义时自动被调用</font>
+
+## lesson17 对象的构造[中]
+### 带有参数的构造函数
+	- 构造函数可以根据需要定义参数
+	- 一个类中可以存在多个重载的构造函数
+	- 构造函数的重载遵循C++重载的规则
+### 友情提醒
+- 对象定义和对象声明不同
+	- 对象定义：申请对象的空间并调用构造函数
+	- 对象声明：告诉编译器存在这样一个对象
+### 需求：开发一个数组类解决原生数组的安全性问题
+- 提供函数<font color=CornflowerBlue>**获取数组长度**</font>
+- 提供函数<font color=CornflowerBlue>**获取数组元素**</font>
+- 提供函数<font color=CornflowerBlue>**设置数组元素**</font>
+### 小结
+- <font color=Teal>构造函数可以根据需要定义参数</font>
+- <font color=Teal>构造函数之间可以存在重载关系</font>
+- <font color=Teal>构造函数遵循C++中重载函数的规则</font>
+- <font color=Teal>对象定义时会触发构造函数的调用</font>
+- <font color=Teal>在一些情况下可以手动调用构造函数</font>
+ 
