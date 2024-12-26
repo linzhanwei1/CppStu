@@ -477,7 +477,7 @@ int main(int argc, char* argv[]) {
 - <font color=Teal>构造函数与类同名并且没有返回值</font>
 - <font color=Teal>构造函数在对象定义时自动被调用</font>
 
-## lesson17 对象的构造[中]
+## lesson18 对象的构造[中]
 ### 带有参数的构造函数
 	- 构造函数可以根据需要定义参数
 	- 一个类中可以存在多个重载的构造函数
@@ -496,4 +496,105 @@ int main(int argc, char* argv[]) {
 - <font color=Teal>构造函数遵循C++中重载函数的规则</font>
 - <font color=Teal>对象定义时会触发构造函数的调用</font>
 - <font color=Teal>在一些情况下可以手动调用构造函数</font>
- 
+
+## lesson19 对象的构造[下]
+### 特殊的构造函数
+- 无参构造函数
+	- 没有参数的构造函数
+	- 当类中没有定义构造函数时，编译器默认提供一个无参构造函数，并且其函数体为空
+- 拷贝构造函数
+	- 参数为<font color=CornflowerBlue>**const**</font> class_name&的构造函数
+	- 当类中没有定义拷贝构造函数时，编译器默认提供一个拷贝构造函数，简单的进行成员变量的值复制
+### 拷贝构造函数的意义
+- 兼容C语言的初始化方式
+- 初始化行为能够符合预期的逻辑
+### 拷贝构造函数的意义
+- 浅拷贝
+	- 拷贝后对象的物理状态相同
+- 深拷贝
+	- 拷贝后对象的逻辑状态相同
+> <font color=CornflowerBlue>**编译器提供的拷贝构造函数只进行浅拷贝!**</font>
+### 什么时候需要进行深拷贝？
+- 对象中有成员指代了系统中的资源
+	- 成员指向了动态内存空间
+	- 成员打开了外存中的文件
+	- 成员使用了系统中的网络端口
+	- ...
+### 一般性原则
+- 自定义拷贝构造函数，必然需要实现深拷贝!!!
+### 小结
+- <font color=Teal>C++编译器会默认提供构造函数</font>
+- <font color=Teal>无参构造函数用于定义对象的默认初始状态</font>
+- <font color=Teal>拷贝构造函数在创建对象时拷贝对象的状态</font>
+- <font color=Teal>对象的拷贝有浅拷贝和深拷贝两种方式</font>
+	- <font color=Teal>浅拷贝使得对象的物理状态相同</font>
+	- <font color=Teal>浅拷贝使得对象的逻辑状态相同</font>
+
+## lesson20 初始化列表的使用
+### 小实验
+- 下面的类定义是否合法？
+	- 如果合法，ci的值是什么，存储在哪里？
+``` C++
+#include <stdio.h>
+
+class Test {
+private:
+	const int ci;
+public:
+	int getCI() { return ci; }
+};
+
+
+int main(int argc, char* argv[]) {
+	Test t;
+	printf("Test.ci:%d\n", t.getCI());
+
+	return 0;
+}
+```
+### 类成员的初始化
+- C++中提供了初始化列表对成员变量进行初始化
+- 语法规则
+``` C++
+className::ClassName():m1(v1),m2(v2),m3(v3){
+	// some other initialize operation
+}
+```
+### 类成员的初始化
+- 成员的初始化顺序与成员的声明顺序相同
+- 成员的初始化顺序与初始化列表中的位置无关
+- 初始化列表先于构造函数的函数体执行
+
+### 类中的const成员
+- 类中的<font color=CornflowerBlue>**const**</font>成员会被分配空间的
+- 类中的<font color=CornflowerBlue>**const**</font>成员本质是只读变量
+- 类中的<font color=CornflowerBlue>**const**</font>成员只能在初始化列表中指定初始值
+> 编译器<font color=Chocolate>**无法**</font>直接得到<font color=CornflowerBlue>**const**</font>成员的初始值，因此无法进入符号表成为真正意义上的常量。
+### 初始化与赋值不同
+- 初始化：对正在创建的对象进行初始值设置
+- 赋值：对已经存在的对象进行值设置
+- 
+### 小结
+- 类中可以<font color=CornflowerBlue>**使用初始化列表对成员进行初始化**</font>
+- 初始化列表<font color=Teal>**先于构造函数体执行**</font>
+- 类中可以定义<font color=Chocolate>**const**</font>成员变量
+- <font color=Chocolate>**const**</font>成员变量必须在初始化列表中指定初始值
+- <font color=Chocolate>**const**</font>成员变量为只读变量
+
+## lesson21 对象的构造顺序
+### 局部对象
+- 当程序执行流到达对象的定义语句时进行构造
+### 堆对象
+- 当程序执行流到达<font color=CornflowerBlue>**new**</font>语句时创建对象
+- 使用<font color=CornflowerBlue>**new**</font>创建对象将自动触发构造函数的调用
+### 全局对象
+- 对象的构造顺序是不确定的
+- 不同的编译器使用不同的规则确定构造顺序
+> 编译器<font color=Chocolate>**不同的编译器厂商行为不同导致构造顺序不同**</font>
+### 小结
+- <font color=Chocolate>**const**</font>的构造顺序依赖于程序的执行流
+- <font color=CornflowerBlue>**堆对象**</font>的构造顺序依赖于<font color=Chocolate>**new**</font>的使用顺序
+- <font color=Teal>**全局对象**</font>的构造顺序是<font color=Chocolate>**不确定的**</font>
+
+
+
