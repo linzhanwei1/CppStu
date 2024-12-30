@@ -522,6 +522,11 @@ int main(int argc, char* argv[]) {
 	- ...
 ### 一般性原则
 - 自定义拷贝构造函数，必然需要实现深拷贝!!!
+### new Test和new Test()的区别
+- 当类中显示定义了无参的构造函数时无区别
+- 当类中没有显示定义无参构造函数时：
+	- new Test 不会对成员变量进行初始化
+	- new Test()会自动完成成员变量初始化
 ### 小结
 - <font color=Teal>C++编译器会默认提供构造函数</font>
 - <font color=Teal>无参构造函数用于定义对象的默认初始状态</font>
@@ -596,5 +601,293 @@ className::ClassName():m1(v1),m2(v2),m3(v3){
 - <font color=CornflowerBlue>**堆对象**</font>的构造顺序依赖于<font color=Chocolate>**new**</font>的使用顺序
 - <font color=Teal>**全局对象**</font>的构造顺序是<font color=Chocolate>**不确定的**</font>
 
+## lesson22 对象的销毁
+### 对象的销毁
+- 生活中的对象都是被初始化后才上市的
+- 生活中的对象被销毁前会做一些清理工作
+### 析构函数
+- C++的类中类中可以定义一个特殊的清理函数
+	- 这个特殊的清理函数叫做<font color=CornflowerBlue>**析构函数**</font>
+	- <font color=CornflowerBlue>**析构函数**</font>的功能与构造函数相反
+- 定义：~ClassName()
+	- 析构函数<font color=Chocolate>**没有参数**</font>也没有返回值类型声明
+	- 析构函数在对象销毁时自动被调用
+### 析构函数的定义准则
+- 当类中<font color=Chocolate>**自定义了构造函数**</font>，并且构造函数中<font color=CornflowerBlue>**使用了系统资源（如：内存申请，文件打开，等）**</font>则需要自定义析构函数。
 
+## lesson23 神秘的临时对象
+### 下面的程序输出什么？
+``` c++
+#include <stdio.h>
 
+class Test {
+private:
+	int mi;
+public:
+	Test() {
+		Test(0); // 临时对象
+	}
+	Test(int i) {
+		mi = i;
+	}
+	void print() { printf("mi = %d\n", mi); }
+};
+
+int main(int argc, char* argv[]) {
+	Test t;		
+
+	t.print();
+
+	return 0;
+}
+```
+> mi = -858993460 // 随机值
+
+### 构造函数是一个特殊函数
+- 是否可以直接调用？	是
+- 是否可以在构造函数中调用构造函数?
+- 直接调用构造函数的行为是什么?
+### 答案
+- 直接调用构造函数将产生一个<font color=CornflowerBlue>**临时对象**</font>
+- <font color=CornflowerBlue>**临时对象**</font>的生命周期只有一条语句的时间
+- <font color=CornflowerBlue>**临时对象**</font>的作用域只在一条语句中
+- <font color=CornflowerBlue>**临时对象**</font>C++中值得警惕的灰色地带
+- <font color=CornflowerBlue>**临时对象**</font>没有名字
+### 小结
+- 直接调用构造函数将产生一个<font color=CornflowerBlue>**临时对象**</font>
+- 临时对象是<font color=Teal>**性能的瓶颈**</font>也是<font color=CornflowerBlue>**bug的来源**</font>
+- 现代C++编译器会尽力<font color=Chocolate>**避开临时对象**</font>成员变量
+- 实际工程开发中需要认为的<font color=Chocolate>**避开临时对象**</font>
+
+## lesson24 经典问题解析二
+### 关于析构的问题
+> 当程序中存在<font color=CornflowerBlue>**多个对象**</font>的时候，如何确定这些对象的<font color=CornflowerBlue>**析构顺序**</font>?
+- <font color=CornflowerBlue>**单个对象**</font>创建时构造函数的调用顺序
+	1. 调用父类的构造过程(<font color=Teal>**后续课程中讲解**</font>)
+	2. 调用<font color=Chocolate>**成员变量的构造函数**</font>（调用顺序与生命顺序相同）
+	3. 调用<font color=CornflowerBlue>**类自身的构造函数**</font>
+- <font color=Chocolate>**析构函数**</font>与对应<font color=Teal>**构造函数的调用顺序相反**</font>
+	
+- <font color=CornflowerBlue>**多个对象**</font>创建时构造函数的调用顺序
+- 析构顺序与构造顺序相反
+
+### 关于析构的答案
+- 对于栈对象和全局对象，类似于入栈和出栈的顺序，<font color=Teal>**最后构造的随心被最先析构**</font>！！
+- <font color=CornflowerBlue>**堆对象**</font>的析构发生在使用<font color=CornflowerBlue>**delete**</font>的时候，<font color=HotPink>**与delete的使用顺序相关**</font>！！
+
+### 关于const对象的疑惑
+> 关键字能否<font color=HotPink>**修饰类的对象**</font>？如果可以，<font color=Chocolate>**有什么特性**</font>？
+- <font color=CornflowerBlue>**const**</font>关键字能够修饰对象
+- <font color=CornflowerBlue>**const**</font>修饰的对象为<font color=MediumOrchid>**只读对象**</font>
+- 只读对象的<font color=Chocolate>**成员变量不允许改变**</font>，运行时无线
+- 只读对象的是<font color=CornflowerBlue>**编译阶段的概念**</font>，运行时无效
+
+### C++中的<font color=HotPink>**const成员函数**</font>
+- <font color=CornflowerBlue>**const**</font>对象<font color=Chocolate>**只能调用const的成员函数**</font>
+- <font color=CornflowerBlue>**const**</font>成员函数中<font color=Chocolate>**只能调用const成员函数**</font>
+- <font color=CornflowerBlue>**const**</font>成员函数中<font color=HotPink>**不能直接改写成员变量的值**</font>
+### <font color=CornflowerBlue>**const**</font>成员函数的定义
+- <font color=MediumOrchid>**Type**</font> <font color=Chocolate>**ClassName::**</font>function(<font color=MediumOrchid>**Type**</font> p) <font color=CornflowerBlue>**const**</font>
+> 类中的<font color=CornflowerBlue>**函数声明**</font>与实际<font color=MediumOrchid>**函数定义**</font>中都必须带<font color=CornflowerBlue>**const**</font>关键字
+
+### 关于类成员的疑问
+> <font color=Chocolate>**成员函数**</font>和<font color=CornflowerBlue>**成员变量**</font>都是隶属于<font color=HotPink>**具体对象**</font>的吗？
+- 从<font color=CornflowerBlue>**面向对象**</font>的角度
+	- 对象由属性(成员变量)和方法(成员函数)构成
+- 从<font color=Chocolate>**程序运行**</font>的角度
+	- 对象由<font color=Teal>**数据**</font>和<font color=MediumOrchid>**函数**</font>构成
+		- 数据可以位于栈，堆，和全局数据区
+		- 函数只能位于代码段
+
+### 结论
+- 每一个<font color=Teal>**对象拥有自己独立的属性**</font>（成员变量）
+- 所有的<font color=Chocolate>**对象共享类的方法**</font> （成员函数）
+- <font color=MediumOrchid>**方法能够直接访问对象的属性**</font>
+- 方法中的<font color=HotPink>**隐藏参数**</font> <font color=CornflowerBlue>**this**</font> 用于指代<font color=MediumOrchid>**当前对象**</font>
+
+### 小结
+- 对象的<font color=CornflowerBlue>**析构顺序于构造顺序相反**</font>
+- <font color=CornflowerBlue>**const**</font>关键字能够修饰对象，得到<font color=Chocolate>**只读对象**</font>
+- 只读对象只能调用<font color=CornflowerBlue>**const**</font>成员函数
+- 所有对象共享类的成员函数
+- 隐藏的<font color=CornflowerBlue>**this**</font>指针用于表示<font color=MediumOrchid>**当前对象**</font>
+
+## lesson25 类的静态成员变量
+### 成员变量的回顾
+- 通过<font color=HotPink>**对象名**</font>能够访问<font color=CornflowerBlue>**public**</font>成员变量
+- 每个对象的<font color=MediumOrchid>**成员变量**</font>都是<font color=Chocolate>**专属的**</font>
+- 成员变量<font color=HotPink>**不能**</font>在对象之间<font color=CornflowerBlue>**共享**</font>
+### 新的需求
+- 统计在程序运行期间<font color=CornflowerBlue>**某个类的对象数目**</font>
+- 保证程序的安全性（<font color=HotPink>**不能使用全局变量**</font>）
+- <font color=Chocolate>**随时**</font>可以获取当前对象的数目
+### 在C++中可以定义<font color=CornflowerBlue>**静态成员变量**</font>
+- 静态成员变量<font color=Chocolate>**属于整个类所有**</font>
+- 静态成员变量的生命周期不依赖于任何对象
+- 可以通过类名直接访问公有静态成员变量
+- <font color=MediumOrchid>**所有对象共享类的静态成员变量**</font>
+- 可以<font color=Teal>**通过对象名访问**</font>公有静态成员变量
+### 静态成员变量的特性
+- 在定义时直接通过<font color=CornflowerBlue>**static**</font>关键字修饰
+- 静态成员变量<font color=CornflowerBlue>**需要在类外单独分配空间**</font>
+- 静态成员变量在程序内部<font color=CornflowerBlue>**位于全局数据区**</font>
+### 语法规则
+> <font color=MediumOrchid>**Type**</font> <font color=CornflowerBlue>**ClassName**</font>::VarName = <font color=Chocolate>**Value**</font>;
+
+### 小结
+- 类中可以通过<font color=CornflowerBlue>**static**</font>关键字定义<font color=Chocolate>**静态成员变量**</font>
+- 静态成员变量<font color=HotPink>**隶属于类所有**</font>
+- 每一个<font color=CornflowerBlue>**对象都可以访问**</font>静态成员变量
+- 静态成员变量<font color=Teal>**在全局数据区分配空间**</font>
+- 静态成员变量的<font color=CornflowerBlue>**生命周期为程序运行期**</font>
+## lesson26 类的静态成员变量
+### 在C++中可以定义静态成员函数
+- 静态成员函数是类中<font color=MediumOrchid>**特殊的成员函数**</font>
+- 静态成员函数<font color=Chocolate>**属于整个类所有**</font>
+- 可以<font color=Teal>**通过类名直接访问**</font>公有静态成员函数
+- 可以<font color=CornflowerBlue>**通过对象名访问**</font>公有静态成员函数
+### 静态成员函数的定义
+- 直接通过<font color=MediumOrchid>**static**</font>关键字修饰成员函数
+### 静态成员函数 vs 普通成员函数
+| / | <font color=CornflowerBlue>静态成员函数</font> | <font color=Chocolate>**普通成员函数**</font> |
+| :-----------: | :-----------: | :-----------: |
+| 所有对象共享 | Yes | Yes|
+| 隐含this指针 | No | Yes |
+| 访问普通成员变量(函数) | No | Yes|
+| 访问静态成员变量(函数) | Yes | Yes|
+| 通过类名直接调用 | Yes | No|
+| 通过对象名直接调用 | Yes | Yes|
+### 小结
+- 静态成员函数是类中<font color=MediumOrchid>**特殊的成员函数**</font>
+- 静态成员函数<font color=HotPink>**没有**</font>隐藏的<font color=CornflowerBlue>**this**</font>参数
+- 静态成员函数<font color=CornflowerBlue>**可以通过类名直接访问**</font>
+- 静态成员函数<font color=MediumOrchid>**只能直接访问静态成员变量(函数)**</font>
+## lesson27 二阶构造模式
+### 构造函数的回顾
+- 类的<font color=CornflowerBlue>**构造函数**</font>用于对象的<font color=Chocolate>**初始化**</font>
+- 构造函数<font color=MediumOrchid>**与类同名并且没有返回值**</font>
+- 构造函数在对象定义时<font color=Teal>**自动被调用**</font>
+### 问题
+1. 如何判断构造函数的执行结果？
+2. 在构造函数中执行return语句会发生什么？
+3. 构造函数执行结束是否意味着对象构造成功？
+> 编程实验一：异常的构造函数27-1.cpp
+``` c++
+#include <stdio.h>
+
+class Test {
+private:
+	int mi;
+	int mj;
+	bool mStatus;
+public:
+	Test(int i, int j):mStatus(false) {
+		mi = i;
+
+		return;
+
+		mj = j;
+		mStatus = true;
+	}
+	int getI() {
+		return mi;
+	}
+	int getJ() {
+		return mj;
+	}
+	int status() {
+		return mStatus;
+	}
+};
+
+int main(int argc, char* argv[]) {
+	Test t1(1, 2);
+
+	if (t1.status()) {
+		printf("t1.mi = %d\n", t1.getI());
+		printf("t1.mj = %d\n", t1.getJ());
+	}
+	else {
+		printf("construct failed!");
+	}
+
+	return 0;
+}
+```
+### 回答
+1. 没有办法[<font color=CornflowerBlue>**只提供自动初始化成员变量的机会**</font>]
+2. 返回就结束了构造函数的调用[<font color=CornflowerBlue>**执行return语句后构造函数立即结束**</font>]
+3. 不一定成功[<font color=CornflowerBlue>**不能保证初始化逻辑一定成功**</font>]
+> 构造函数能决定的<font color=Chocolate>**只是对象的初始状态**</font>，<font color=CornflowerBlue>**而不是对象的诞生**</font>!!
+### <font color=CornflowerBlue>**半成品对象的概念**</font>
+- <font color=Chocolate>**初始化操作不能按照预期完成而得到的对象**</font>
+- 半成品对象是<font color=MediumOrchid>**合法的C++对象**</font>,也是<font color=HotPink>**Bug的重要来源**</font>
+### 工程开发中的构造过程可分为
+- <font color=CornflowerBlue>**资源无关**</font>的初始化操作
+	- 不可能出现异常情况的操作
+- 需要<font color=Chocolate>**使用系统资源**</font>的操作
+	- 可能出现异常情况：如：内存申请，访问文件
+### 二阶构造示例：
+```C++
+class TwoPhaseCons {
+private:
+	TwoPhaseCons(){		// 第一阶段构造函数
+	}
+	bool construct() {	// 第二阶段构造函数
+		return true;
+	}
+public:
+	static TwoPhaseCons* NewInstance();	// 对象创建函数
+};
+
+TwoPhaseCons* TwoPhaseCons::NewInstance() {
+	TwoPhaseCons* ret = new TwoPhaseCons();
+	
+	// 若第二阶段构造失败，返回NULL
+	if(!(ret && ret->construct())) {
+		delete ret;
+		ret = nullptr;
+	}
+	
+	return ret;
+}
+```
+### 小结
+- 构造函数<font color=Chocolate>**只能决定对象的初始化状态**</font>
+- 构造函数中<font color=CornflowerBlue>**初始化操作的失败不影响对象的诞生**</font>
+- 初始化不完全的<font color=Chocolate>**半成品对象是Bug的重要来源**</font>
+- 二阶构造认为的<font color=MediumOrchid>**将初始化过程分为两部分**</font>
+- <font color=CornflowerBlue>**二阶构造**</font>能够确保创建的<font color=CornflowerBlue>**对象都是完整初始化的**</font>
+## lesson28 友元的尴尬能力
+### 什么是友元？
+- 友元是C++中的<font color=Chocolate>**一种关系**</font>
+- 友元关系发生在<font color=HotPink>**函数与类之间**</font>或者<font color=MediumOrchid>**类鱼类之间**</font>
+- 友元关系是单项的，不能传递
+### 友元的用法
+- 在类中以<font color=CornflowerBlue>**friend**</font>关键字声明友元
+- 类的友元可以是<font color=MediumOrchid>**其他类或者具体函数**</font>
+- 友元<font color=CornflowerBlue>**不是**</font>类的一部分
+- 友元<font color=HotPink>**不受**</font>类中访问级别的限制
+- <font color=MediumOrchid>**友元可以直接访问具体类的所有成员**</font>
+```c++
+class Point{
+private:
+	double x;
+	double y;
+	
+	friend void func(Point& p);	// 将全局域的函数func声明为class Point的友元
+};
+
+void func(Point& p) {
+
+}
+```
+### 友元的尴尬
+- 友元是为了<font color=CornflowerBlue>**兼顾C语言的高效**</font>而诞生的
+- 友元<font color=Chocolate>**直接破坏**</font>了面向对象的封装性
+- 友元在实际产品中的<font color=Chocolate>**高效是得不偿失的**</font>
+- 友元在现代软件工程中<font color=MediumOrchid>**已经逐渐被遗弃**</font>
+- 友元关系<font color=Chocolate>**不具备传递性**</font>
+- 类的友元可以是<font color=CornflowerBlue>**其它类的成员函数**</font>
+- 类的引用可以是<font color=MediumOrchid>**某个完整的类**</font>
+	- 所有的成员函数都是友元
