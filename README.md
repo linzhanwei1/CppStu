@@ -339,9 +339,11 @@ namespace Name {
 	- 在源码中无法快速定位所有使用强制类型转换的语句
 ### 新式类型转换
 - C++将强制类型转换分为4种不同的类型
+
 | static_cast | const_cast |
 | ----------- | ----------- |
 | dynamic_cast | reinterpret_cast |
+
 > 用法：xxx_cast<Type>(Expression)
 
 - static_cast强制类型转换
@@ -891,3 +893,217 @@ void func(Point& p) {
 - 类的友元可以是<font color=CornflowerBlue>**其它类的成员函数**</font>
 - 类的引用可以是<font color=MediumOrchid>**某个完整的类**</font>
 	- 所有的成员函数都是友元
+## lesson29 类中的函数重载
+### 函数重载回顾
+- 函数重载的<font color=Chocolate>**本质为相互独立的不同函数**</font>
+- C++中通过<font color=Chocolate>**函数名**</font>和<font color=CornflowerBlue>**函数参数**</font>确定函数调用
+- <font color=Chocolate>**无法**</font>直接通过<font color=CornflowerBlue>**函数名**</font>得到重载函数的<font color=CornflowerBlue>**入口地址**</font>
+- 函数重载<font color=MediumOrchid>**必然发生在同一个作用域中**</font>
+### 类中的成员函数可以进行重载
+- <font color=Chocolate>**构造函数的重载**</font>
+- <font color=CornflowerBlue>**普通成员函数的重载**</font>
+- <font color=MediumOrchid>**静态成员函数的重载**</font>
+### 重载的本质
+1. 重载函数的<font color=MediumOrchid>**本质为多个不同的函数**</font>
+2. <font color=CornflowerBlue>**函数名**</font>和<font color=CornflowerBlue>**参数列表**</font>是唯一标识
+3. 函数重载<font color=Chocolate>**必须发生在同一个作用域中**</font>
+### 重载的意义
+- 通过<font color=Chocolate>**函数名**</font>对函数功能进行提示
+- 通过<font color=CornflowerBlue>**参数列表**</font>对函数用法进行提示
+- 扩展系统中<font color=MediumOrchid>**构造函数的重载**</font>的函数功能
+## lesson30 操作符重载
+### 操作符重载
+- C++中的<font color=CornflowerBlue>**重载**</font>能够<font color=Chocolate>**扩展操作符的功能**</font>
+- 操作符的重载<font color=CornflowerBlue>**以函数的方式进行**</font>
+- 本质：用<font color=MediumOrchid>**特殊形式的**</font>函数扩展操作符的功能
+- 通过<font color=CornflowerBlue>**operator**</font>关键字可以定义<font color=CornflowerBlue>**特殊的函数**</font>
+- <font color=CornflowerBlue>**operator**</font>的本质是<font color=CornflowerBlue>**通过函数重载操作符**</font>进行操作符重载
+> <font color=Chocolate>**Type**</font> <font color=CornflowerBlue>**operator**</font> <font color=Chocolate>**Sign**</font>(<font color=CornflowerBlue>**const**</font> <font color=Chocolate>**Type**</font> p1, (<font color=CornflowerBlue>**const**</font> <font color=Chocolate>**Type**</font> p2)
+> {
+> 	<font color=Chocolate>**Type**</font> ret;
+> 	<font color=CornflowerBlue>**return**</font> ret;
+> }
+> <font color=HotPink>**Sign**</font>为系统中预定义的操作符：+、-、*、/等
+
+### 可以将<font color=CornflowerBlue>**操作符重载函数**</font>定义为类的成员函数
+- <font color=CornflowerBlue>**比全局操作符重载函数少一个参数**</font>(<font color=MediumOrchid>**左操作数**</font>)
+- <font color=CornflowerBlue>**不需要依赖友元**</font>就可以完成操作符重载
+- <font color=HotPink>**编译器优先在成员函数中寻找操作符重载函数**</font>
+> <font color=CornflowerBlue>**class**</font> <font color=Chocolate>**Type**</font>
+> {
+> <font color=CornflowerBlue>**public:**</font>
+> 	<font color=Chocolate>**Type**</font> <font color=CornflowerBlue>**operator**</font> <font color=Chocolate>**Sign**</font>(<font color=CornflowerBlue>**const**</font> <font color=Chocolate>**Type**</font>& p) {
+>	<font color=Chocolate>**Type**</font> ret;
+>	<font color=CornflowerBlue>**return**</font> ret;
+> };
+
+## lesson31 完善的复数类
+### 复数类应该有的操作
+- 运算：+、-、*、/
+- 比较：==，!=
+- 赋值：=
+- 求模：modulus
+
+### 利用操作符重载
+- 统一<font color=Chocolate>**复数**</font>与<font color=HotPink>**实数**</font>的运算方式
+- 统一<font color=Chocolate>**复数**</font>与<font color=HotPink>**实数**</font>的比较方式
+```c++
+Complex operator + (const Complex& c);
+Complex operator - (const Complex& c);
+Complex operator * (const Complex& c);
+Complex operator / (const Complex& c);
+
+bool operator == (const Complex& c);
+bool operator != (const Complex& c);
+
+Complex& operator = (const Complex& c);
+```
+### 小结
+- C++规定<font color=Teal>赋值操作符</font>(=)<font color=Teal>只能重载为成员函数</font>
+- 操作符重载<font color=Chocolate>不能改变</font>原操作符的<font color=HotPink>优先级</font>
+- 操作符重载<font color=Chocolate>不能改变</font>操作数的个数
+- 操作符重载<font color=Chocolate>不能改变</font>操作符的<font color=Teal>原有语义</font>
+## lesson32 初探C++标准库
+### C++标准库
+- C++标准库并<font color=Chocolate>不是</font>C++语言的一部分
+- C++标准库是由<font color=MediumOrchid>类库</font>和<font color=Chocolate>函数库</font>组成的集合
+- C++标准库中定义的类和对象都位于<font color=Chocolate>std</font>命名空间
+- C++标准库的头文件都<font color=Chocolate>不带</font><font color=Teal>.h</font>后缀
+- C++标准库<font color=Chocolate>涵盖了C库的功能</font>
+## lesson33 C++中的字符串类
+### C++标准库提供了string类型
+- string直接支持<font color=MediumOrchid>字符串连接</font>
+- string直接支持<font color=Chocolate>字符串的大小比较</font>
+- string直接支持<font color=MediumOrchid>字符串查找和提取</font>
+- string直接支持<font color=CornflowerBlue>字符串的插入和替换</font>
+### 字符串与数字的转换
+- 标准库中提供了<font color=Chocolate>相关的类</font>对字符串和数字进行转换
+- 字符串流类(<font color=MediumOrchid>sstream</font>)用于string的转换
+### 使用方法
+- string -> 数字
+```c++
+	istringstream iss("123.45");
+	double num;
+	iss >> num;
+```
+- 数字 -> string
+```c++
+	ostringstream oss;
+	oss << 543.21;
+	string s = oss.str();
+```
+
+## lesson34 数组操作符的重载
+### 数组访问操作符(<font color=HotPink>[]</font>)
+- 只能通过类的<font color=CornflowerBlue>成员函数重载</font>
+- 重载函数<font color=Teal>能且仅能</font>使用一个参数
+- 可以定义不同参数的<font color=Chocolate>多个重载函数</font>
+## lesson35 函数对象分析
+### 编写一个函数
+- 函数可以获得斐波那契数列每项的值
+- <font color=MediumOrchid>**每调用一次返回一个值**</font>
+- <font color=CornflowerBlue>**函数可以根据需要重复使用**</font>
+### 解决方案：函数对象
+- <font color=HotPink>**使用具体的类对象取代函数**</font>
+- 该类的对象<font color=CornflowerBlue>**具备函数调用的行为**</font>
+- <font color=Chocolate>**构造函数**</font>指定具体string直接支持<font color=MediumOrchid>**数列项的起始位置**</font>
+- 多个对象相互独立的求解数列项
+### 小结
+- 函数调用操作符(<font color=HotPinkl>**()**</font>)是可重载的
+- 函数调用操作符只能通过类的<font color=CornflowerBlue>**成员函数重载**</font>
+- 函数调用操作符可以定义不同参数的<font color=Chocolate>**多个重载函数**</font>
+- 函数对象用于在工程中<font color=HotPinkl>**取代函数指针**</font>
+## lesson36 经典问题解析三
+### 什么时候需要<font color=CornflowerBlue>**重载赋值操作符**</font>
+- 编译器为每个类<font color=Chocolate>**默认重载了赋值操作符**</font>
+- 默认的赋值操作符<font color=CornflowerBlue>**仅完成浅拷贝**</font>
+- 当需要进行<font color=MediumOrchid>**深拷贝时必须重载赋值操作符**</font>
+- <font color=Teal>**赋值操作符**</font>与<font color=Teal>**拷贝构造函数**</font>由相同的存在意义
+### 小结
+- 在需要进行<font color=HotPinkl>**深拷贝**</font>的时候必须<font color=Chocolate>**重载赋值操作符**</font>
+- <font color=CornflowerBlue>**赋值操作符**</font>和<font color=Chocolate>**拷贝构造函数**</font>有同等重要的意义
+- <font color=Chocolate>**string**</font>类通过一个数据空间保存字符数据
+- <font color=Chocolate>**string**</font>类通过一个成员变量保存当前字符串的长度
+- C++开发时尽量避开C语言中惯用的编程思想
+## lesson37 智能指针
+### 内存泄漏
+- 动态申请堆空间，<font color=CornflowerBlue>**用完后不归还**</font>
+- C++语言中<font color=Chocolate>**没有垃圾回收**</font>的机制
+- 指针<font color=HotPink>**无法控制**</font>所指堆空间的生命周期
+> 本质问题是指针和实际指向的内存空间没有任何关系
+
+### 我们需要什么
+- 需要一个<font color=HotPink>**特殊的**</font>指针
+- 指针生命周期结束时<font color=Chocolate>**主动释放堆空间**</font>
+- 一片堆空间<font color=CornflowerBlue>**最多只能由一个指针标识**</font>
+- <font color=MediumOrchid>**无法控制**</font>指针运算和指针比较
+### 解决方案
+- <font color=MediumOrchid>**重载指针特征操作符**</font>(->和*)
+- 只能通过类的<font color=CornflowerBlue>**成员函数重载**</font>
+- 重载函数<font color=Chocolate>**不能**</font>使用参数
+- 只能定义<font color=MediumOrchid>**一个**</font>重载函数
+## lesson38 逻辑操作符的陷阱
+### 逻辑运算符的原生语义
+- 操作数只有两种值(<font color=CornflowerBlue>**true**</font>和<font color=CornflowerBlue>**fasle**</font>)
+- 逻辑表达式<font color=HotPink>**不用完全计算就能确定最终值**</font>
+- 最终结果只能是<font color=CornflowerBlue>**true**</font>或者<font color=CornflowerBlue>**false**</font>
+### 一些有用的建议
+- <font color=HotPink>**实际工程开发中避免重载逻辑操作符**</font>
+- 通过<font color=Chocolate>**重载比较操作符**</font>代替逻辑操作符重载
+- 直接<font color=MediumOrchid>**使用成员函数**</font>代替逻辑操作符重载
+- 使用<font color=HotPink>**全局函数**</font>对逻辑操作符进行重载
+## lesson40 前置操作符和后置操作符
+- 现代编译器产品会<font color=Chocolate>**对代码进行优化**</font>
+- 优化使得最终的二进制程序<font color=MediumOrchid>**更加高效**</font>
+- 优化后的二进制程序<font color=CornflowerBlue>**丢失了C/C++的原生语义**</font>
+- <font color=Chocolate>**不可能**</font>从编译后的二进制程序<font color=Chocolate>**还原C/C++程序**</font>
+### ++操作符可以被重载
+- <font color=HotPink>**全局函数**</font>和<font color=Chocolate>**成员函数**</font>均可进行重载
+- 重载前置++操作符<font color=MediumOrchid>**不需要额外的参数**</font>
+- 重载后置++操作符<font color=Teal>**需要一个**</font>int<font color=Teal>**类型的占位参数**</font>
+### 真正的区别
+- 对于<font color=Chocolate>**基础类型**</font>的变量
+	- 前置++的效率与后置++的效率基本相同
+	- 根据项目组编码规范进行选择
+- 对于<font color=CornflowerBlue>**类类型**</font>的对象
+	- 前置++的效率高于后置++
+	- 尽量使用<font color=MediumOrchid>**前置++操作符提高程序效率**</font>
+## lesson41 类型转换函数
+### 基本数据类型转换
+- 标准数据类型之间会进行<font color=Teal>**隐士的类型安全转换**</font>
+- 转换规则如下：
+> char  ->
+> 		int->unsigned int->long->unsigned long->float->double
+> short->
+
+### 再论构造函数
+- 构造函数可以定义<font color=Chocolate>**不同类型的参数**</font>
+- 参数满足下列条件时称为<font color=HotPink>**转换构造函数**</font>
+	- <font color=Teal>**有且仅有一个参数**</font>
+	- <font color=Teal>**参数是基本类型**</font>
+	- <font color=Teal>**参数是其它类类型**</font>
+### 编译器的行为
+- 编译器<font color=CornflowerBlue>**尽力尝试**</font>的结果是<font color=HotPink>**隐式类型转换**</font>
+- 隐式类型转换
+	- 会让程序以<font color=MediumOrchid>**意想不到**</font>的方式进行工作
+	- 是工程中<font color=Chocolate>**bug**</font>的重要来源
+- 工程中通过<font color=CornflowerBlue>**explicit**</font>关键字<font color=Chocolate>**杜绝编译器的转换尝试**</font>
+- 转换构造函数被<font color=CornflowerBlue>**explicit**</font>修饰时只能进行<font color=Chocolate>**显示转换**</font>
+	- <font color=CornflowerBlue>**static_cast**</font><<font color=Chocolate>**ClassName**</font>>(value);
+	- <font color=Chocolate>**ClassName**</font>(value);
+	- (<font color=Chocolate>**ClassName**</font>)value		// <font color=Teal>**不推荐**</font>
+### 类型转换函数
+- C++类中可以定义<font color=CornflowerBlue>**类型转换函数**</font>
+- 类型转换函数用于<font color=CornflowerBlue>**将类对象转换为其它类型**</font>
+- 语法规则：
+```c++
+operator Type() {
+	Type ret;
+	// ...
+	return ret;
+}
+```
+### <font color=CornflowerBlue>**类型转换函数**</font> vs <font color=MediumOrchid>**转换构造函数**</font>
+- <font color=Chocolate>**无法抑制**</font>隐式的类型转换函数调用
+- 类型转换函数<font color=Teal>**可能与转换构造函数冲突**</font>
+- 工程中以<font color=HotPink>**Type**</font> <font color=CornflowerBlue>**toType**</font>()的公有成员函数代替类型转换函数
