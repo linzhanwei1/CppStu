@@ -1107,3 +1107,398 @@ operator Type() {
 - <font color=Chocolate>**无法抑制**</font>隐式的类型转换函数调用
 - 类型转换函数<font color=Teal>**可能与转换构造函数冲突**</font>
 - 工程中以<font color=HotPink>**Type**</font> <font color=CornflowerBlue>**toType**</font>()的公有成员函数代替类型转换函数
+## lesson43 继承的概念和意义
+### 组合关系的特点
+- 将<font color=Chocolate>**其它类的对象**</font>作为<font color=Chocolate>**当前类的成员**</font>使用
+- 当前类的对象与成员对象的<font color=MediumOrchid>**生命期相同**</font>
+- 成员对象在<font color=CornflowerBlue>**用法上**</font>与普通对象<font color=CornflowerBlue>**完全一致**</font>
+### 面向对象中的<font color=CornflowerBlue>**继承**</font>指类之间的<font color=Chocolate>**父子关系**</font>
+- 子类拥有父类的<font color=MediumOrchid>**所有属性和行为**</font>
+- 子类就是一种<font color=Navy>**特殊的父类**</font>
+- <font color=GoldenRod>**子类对象可以当作父类对象使用**</font>
+- 子类中可以<font color=Teal>**添加父类没有的**</font>方法和属性
+> C++中通过下面的方式描述继承关系
+``` C++
+class Parent {
+private:
+	int mv;
+public:
+	void method() {};
+};
+
+class Child:public Parent	// 描述继承关系
+{};
+```
+### 重要原则：
+- 子类就是一个<font color=Chocolate>**特殊的父类**</font>
+- 子类对象可以<font color=MediumOrchid>**直接初始化**</font>父类对象
+- 子类对象可以<font color=HotPink>**直接赋值给**</font>父类对象
+### 继承的意义
+- 继承是C++中<font color=MediumOrchid>**代码复用**</font>的重要手段。通过<font color=Chocolate>**继承**</font>，可以<font color=CornflowerBlue>**获得父类的所有功能**</font>，并且可以在子类中<font color=Teal>**重写已有功能**</font>，或者<font color=Teal>**添加新功能**</font>。
+### 小结
+- 继承是面向对象中<font color=CornflowerBlue>**类之间的一种关系**</font>
+- 子类拥有父类的<font color=CornflowerBlue>**所有属性和行为**</font>
+- 子类对象可以当作父类对象使用
+- 子类中可以<font color=Teal>**添加父类没有的**</font>方法和属性
+- 继承是面向对象中<font color=HotPink>**代码复用的重要手段**</font>
+## lesson44 继承中的访问级别
+- 面向对象中的访问级别不只是<font color=CornflowerBlue>**public**</font>和<font color=CornflowerBlue>**private**</font>
+- 可以定义<font color=Chocolate>**protected**</font>访问级别
+- 关键字<font color=CornflowerBlue>**protected**</font>的意义
+	- 修饰的成员<font color=Chocolate>**不能被外界直接访问**</font>
+	- 修饰的成员<font color=MediumOrchid>**可以被子类直接访问**</font>
+### 小结
+- 面向对象中的访问级别不只是<font color=CornflowerBlue>**public**</font>和<font color=CornflowerBlue>**private**</font>
+- <font color=HotPink>**protected**</font>修饰的成员<font color=Teal>**不能被外界所访问**</font>
+- <font color=HotPink>**protected**</font>使得<font color=Chocolate>**子类能够访问父类的成员**</font>
+- <font color=HotPink>**protected**</font>关键字是<font color=HotPink>**为了继承而专门设计的**</font>
+- 没有<font color=HotPink>**protected**</font>就无法完成真正意义上的<font color=Chocolate>**代码复用**</font>
+## lesson45 不同的继承方式(略)
+## lesson46 继承中的构造与析构
+### 子类对象的构造
+- 子类中可以定义构造函数
+- 子类构造函数
+	- <font color=CornflowerBlue>**必须对继承而来的成员进行初始化**</font>
+	- 直接通过<font color=MediumOrchid>**初始化列表**</font>或者<font color=MediumOrchid>**赋值的方式**</font>进行初始化
+	- <font color=Chocolate>**调用父类构造函数**</font>进行初始化
+### 父类构造函数在子类中的调用方式
+- 默认调用
+	- 适用于<font color=CornflowerBlue>**无参构造函数**</font>和<font color=Teal>**使用默认参数的构造函数**</font>
+- 显示调用
+	- 通过<font color=Chocolate>**初始化列表**</font>进行调用
+	- 适用于<font color=HotPink>**所有**</font>父类构造函数
+### 父类构造函数的调用
+```c++
+class Child: public Parent {
+public:
+	Child() {	// 隐式调用
+		cout << "Child()" << endl;
+	}
+	Child(String s) : Parent("Parameter to Parent") {	// 显示调用
+		cout << "Child() : " << s << endl;
+	} 
+};
+```
+### 构造规则
+- 子类对象在创建时会<font color=CornflowerBlue>**首先调用父类的构造函数**</font>
+- <font color=Chocolate>**先执行父类构造函数**</font>再执行子类的构造函数
+- 父类构造函数可以被<font color=MediumOrchid>**隐式调用**</font>或者<font color=HotPink>**显示调用**</font>
+### <font color=CornflowerBlue>**对象**</font>创建时构造函数的调用顺序
+1. <font color=MediumOrchid>**调用父类的构造函数**</font>
+2. 调用<font color=MediumOrchid>**成员变量的构造函数**</font>
+3. 调用<font color=Green>**类自身的构造函数**</font>
+> 先父母，后客人，再自己
+
+### <font color=CornflowerBlue>**析构函数**</font>的调用顺序与构造函数相反
+1. 执行<font color=CornflowerBlue>**自身的**</font>析构函数
+2. 执行<font color=Chocolate>**成员变量的**</font>析构函数
+3. 执行<font color=MediumOrchid>**父类的**</font>析构函数
+### 小结
+- 子类对象在创建时<font color=CornflowerBlue>**需要调用父类构造函数**</font>进行初始化
+- 先执行<font color=CornflowerBlue>**父类构造函数**</font>然后执行<font color=HotPink>**成员的构造函数**</font>
+- 父类构造函数<font color=Chocolate>**显示调用需要在初始化列表中进行**</font>析构函数
+- 子类对象在销毁时<font color=Green>**需要调用父类析构函数**</font>进行清理
+- 析构顺序与构造顺序<font color=HotPink>**对称相反**</font>
+## lesson47 父子间的冲突
+### 父子间的冲突
+- 子类<font color=CornflowerBlue>**可以定义**</font>父类中的<font color=Chocolate>**同名成员**</font>
+- 子类中的成员将<font color=MediumOrchid>**隐藏父类中的同名成员**</font>
+- 父类中的<font color=MediumOrchid>**同名成员依然存在于子类中**</font>
+- 通过<font color=HotPink>**作用域分辨符（::）**</font>访问父类中的同名成员
+- 子类中的函数将<font color=GoldenRod>**隐藏父类的同名函数**</font>
+- 子类<font color=HotPink>**无法重载**</font>父类中的成员函数
+- 使用<font color=MediumOrchid>**作用域分辨符**</font>访问父类中的同名函数
+- 子类可以定义父类中<font color=Green>**完全相同的成员函数**</font>
+## lesson48 同名覆盖引发的问题
+### 子类对象可以当作父类对象使用(兼容性)
+- 子类对象可以<font color=CornflowerBlue>**直接赋值**</font>给父类对象
+- 子类对象可以<font color=Green>**直接初始化**</font>父类对象
+- <font color=Green>**父类指针**</font>可以<font color=HotPink>**直接指向**</font>子类 对象
+- <font color=Chocolate>**父类引用**</font>可以<font color=MediumOrchid>**直接引用**</font>子类对象
+### 当使用父类指针(引用)指向子类对象时
+- 子类对象<font color=CornflowerBlue>**退化为父类对象**</font>
+- <font color=Chocolate>**只能访问**</font>父类中定义的成员
+- 可以<font color=HotPink>**直接访问**</font>被子类<font color=MediumOrchid>**覆盖的**</font>同名成员
+### 特殊的同名函数
+- 子类中可以<font color=CornflowerBlue>**重定义**</font>父类中<font color=HotPink>**已经存在的成员函数**</font>
+- 这种重定义<font color=Chocolate>**发生在继承中**</font>，叫做<font color=MediumOrchid>**函数重写**</font>
+- <font color=Green>**函数重写**</font>时同名覆盖的一种特殊情况
+``` c++
+#include <iostream>
+
+using namespace std;
+
+class Parent {
+public:
+	void print() {
+		cout << "I'm Parent." << endl;
+	}
+};
+
+class Child : public Parent {
+public:
+	void print() {	// 函数重写，有一定意义
+		cout << "I'm Child." << endl;
+	}
+};
+
+int main(int argc, char* argv[]) {
+	Parent().print();
+	Child().print();
+
+	return 0;
+}
+```
+### 父子间的赋值兼容
+- <font color=CornflowerBlue>**编译期间**</font>，编译器<font color=Chocolate>**只能根据指针的类型判断**</font>所指向的对象
+- 根据赋值兼容,<font color=MediumOrchid>**编译器认为父类指针指向的是父类对象**</font>
+- 因此，编译结果只可能是<font color=HotPink>**调用父类中定义的同名函数**</font>
+### 小结
+- 子类对象可以当作父类对象使用(<font color=HotPink>**赋值兼容**</font>)
+- 父类指针可以<font color=Chocolate>**正确的指向子类对象**</font>
+- 父类引用可以<font color=MediumOrchid>**正确的代表子类对象**</font>
+- 子类中可以<font color=CornflowerBlue>**重写**</font>父类中<font color=HotPink>**的成员函数**</font>
+## lesson49 多态的概念和本质
+### 面向对象中期望的行为
+- <font color=CornflowerBlue>**根据实际的对象类型判断如何调用重写函数**</font>
+- 父类指针(引用)指向
+	- <font color=Green>**父类对象则调用父类中定义的函数**</font>
+	- <font color=Chocolate>**子类对象则调用子类中定义的重写函数**</font>
+### 面向对象中的多态的概念
+- 根据实际的<font color=HotPink>**对象类型决定函数调用**</font>的具体目标
+- 同样的<font color=CornflowerBlue>**调用语句**</font>在实际运行时有<font color=Chocolate>**多种不同的表现形态**</font>
+### C++语言直接支持多态概念
+- 通过使用<font color=CornflowerBlue>**virtual**</font>关键字对<font color=HotPink>**多态**</font>进行支持
+- 被<font color=CornflowerBlue>**virtual**</font>声明的函数<font color=MediumOrchid>**被重写后具有多态特性**</font>
+- 被<font color=CornflowerBlue>**virtual**</font>声明的函数叫做<font color=Chocolate>**虚函数**</font>
+### 多态的意义
+- 在程序<font color=CornflowerBlue>**运行过程中**</font>展现出<font color=Chocolate>**动态的特性**</font>
+- <font color=MediumOrchid>**函数重写必须多态实现**</font>，否则没有意义
+- 多态是<font color=Green>**面向对象组件化程序设计**</font>的基础特性
+### 理论中的概念
+- 静态联编
+	- 在程序的<font color=Green>**编译期间就能确定具体的函数调用**</font> 函数重载
+- 动态联编
+	- 在程序<font color=HotPink>**实际运行后才能确定具体的函数调用**</font> 函数重写
+## lesson50 C++对象模型分析(上)
+### class是一种特殊的struct
+- 在内存中<font color=CornflowerBlue>**class**</font>依旧可以看作变量的集合
+- <font color=CornflowerBlue>**class**</font>与<font color=CornflowerBlue>**struct**</font>遵循相同的内存对齐规则
+- <font color=CornflowerBlue>**class**</font>中的<font color=Chocolate>**成员函数**</font>与<font color=MediumOrchid>**成员变量**</font>是<font color=Green>**分开存放**</font>的
+	- 每个对象有<font color=HotPink>**独立的**</font>成员变量
+	- 所有对象<font color=HotPink>**共享**</font>类中的成员函数
+### 运行时的对象退化为结构体的形式
+- 所有<font color=Chocolate>**成员函数**</font>在内存中<font color=MediumOrchid>**依次排布**</font>
+- 成员变量间<font color=Green>**可能存在内存空隙**</font>
+- 可以<font color=Green>**通过内存地址**</font>直接访问成员变量
+- 访问权限关键字在运行时失效
+### C++对象模型分析
+- 类中的<font color=CornflowerBlue>**成员函数**</font>位于<font color=Chocolate>**代码段中**</font>
+- 调用成员函数时<font color=Green>**对象地址作为参数隐式传递**</font>
+- 成员函数<font color=MediumOrchid>**通过对象地址访问成员变量**</font>
+- <font color=Teal>**语法规则隐藏了对象地址的传递过程**</font>
+### 小结
+- C++中的类对象在<font color=CornflowerBlue>**内存布局上与结构体相同**</font>
+- <font color=MediumOrchid>**成员变量**</font>和<font color=Chocolate>**成员函数**</font>在内存中分开存放
+- 父类引用可以<font color=Green>**访问权限**</font>关键字在<font color=HotPink>**运行时失效**</font>
+- 调用成员函数时<font color=CornflowerBlue>**对象地址作为参数隐式传递**</font>
+## lesson51 C++对象模型分析(下)
+### 继承对象模型
+- 在C++编译器的内部<font color=CornflowerBlue>**类可以理解为结构体**</font>
+- 子类是由<font color=HotPink>**父类成员叠加子类新成员**</font>得到的
+### 多态对象模型
+- 当类中<font color=CornflowerBlue>**声明虚函数**</font>时，编译器会在类中<font color=CornflowerBlue>**生成一个虚函数表**</font>
+- 虚函数表是一个<font color=Chocolate>**存储成员函数地址的数据结构**</font>
+- 虚函数表是<font color=Green>**由编译器自动生成与维护的**</font>
+- <font color=CornflowerBlue>**virtual**</font>成员函数会被编译器<font color=MediumOrchid>**放入虚函数表中**</font>
+- <font color=HotPink>**存在虚函数时**</font>，每个对象中都有一个指向虚函数表的指针
+### 小结
+- 继承的本质就是<font color=CornflowerBlue>**父子间成员变量的叠加**</font>
+- C++中的多态是<font color=Chocolate>**通过虚函数表实现的**</font>
+- 虚函数表是<font color=Green>**由编译器自动生成与维护的**</font>
+- 虚函数的效用效率<font color=Chocolate>**低于**</font>普通成员函数
+## lesson52 C++中的抽象类和接口
+### 什么是抽象类
+- 在现实中<font color=CornflowerBlue>**需要知道具体的图形类型才能求面积**</font>
+- 所以对<font color=CornflowerBlue>**概念上的"图形"**</font>求面积是没有意义的！
+### 面向对象中的<font color=CornflowerBlue>**抽象类**</font>
+- 可用于标识现实世界中的<font color=MediumOrchid>**抽象概念**</font>
+- 是一种只能<font color=HotPink>**定义类型**</font>，而<font color=CornflowerBlue>**不能产生对象**</font>的类
+- <font color=CornflowerBlue>**只能被继承**</font>并重写相关函数
+- 直接特征是<font color=HotPink>**相关函数没有完整的实现**</font>
+### 抽象类与纯虚函数
+- C++语言中<font color=CornflowerBlue>**没有抽象类**</font>的概念
+- C++中<font color=HotPink>**通过纯虚函数实现抽象类**</font>
+- 纯虚函数是指<font color=CornflowerBlue>**只能定义原型**</font>的成员函数
+- 一个C++类中<font color=HotPink>**存在纯虚函数**</font>就成了抽象类
+- 抽象类<font color=CornflowerBlue>**只能**</font>用作父类<font color=CornflowerBlue>**被继承**</font>
+- 子类必须<font color=HotPink>**实现纯虚函数**</font>的具体功能
+- 纯虚函数被实现后<font color=CornflowerBlue>**成为虚函数**</font>
+- 如果子类<font color=HotPink>**没有实现纯虚函数**</font>，则<font color=HotPink>**子类成为抽象类**</font>
+### 纯虚函数的语法规则
+```C++
+class Shape {
+public:
+	virtual double area() = 0;
+};
+```
+> "<font color=HotPink>**=0**</font>",用于告诉编译器当前是声明纯虚函数，因此不需要定义函数体。
+
+### 满足下面条件的C++类则称为<font color=CornflowerBlue>**接口**</font>（<font color=Green>**interface**</font>）
+- 类中<font color=HotPink>**没有**</font>定义任何的<font color=HotPink>**成员变量**</font>
+- 所有的<font color=CornflowerBlue>**成员函数都是公有的**</font>
+- 所有的<font color=HotPink>**成员函数都是纯虚函数**</font>
+- 接口是一种<font color=CornflowerBlue>**特殊的抽象类**</font>
+## lesson53 被遗弃的多重继承(上)
+### C++支持编写<font color=CornflowerBlue>**多重继承**</font>的代码
+- 一个子类可以<font color=CornflowerBlue>**拥有多个父类**</font>
+- 子类拥有<font color=CornflowerBlue>**所有父类的**</font>成员变量
+- 子类继承<font color=HotPink>**所有父类的**</font>成员函数
+- 子类对象可以<font color=CornflowerBlue>**当作任意父类对象**</font>使用
+> 多重继承的语法规则
+```c++
+class Derived : public BaseA, public BaseB, public BaseC{
+	// ...
+};
+```
+> 多重继承的本质与单继承相同!
+
+### 多重继承的问题
+- 通过<font color=CornflowerBlue>**多重继承**</font>
+- 多重继承可能产生冗余的成员
+### 虚继承
+- <font color=CornflowerBlue>**虚继承**</font>能够<font color=HotPink>**解决数据冗余**</font>问题
+- 中间层父类<font color=CornflowerBlue>**不再关系顶层父类的初始化**</font>
+- 最终子类必须<font color=HotPink>**直接调用顶层父类的构造函数**</font>
+### 小结
+- C++<font color=CornflowerBlue>**支持多重继承**</font>的编程方式
+- 多重继承<font color=HotPink>**容易带来问题**</font>
+	- 可能出现<font color=CornflowerBlue>**“同一个对象的地址不同”**</font>的情况
+	- 虚继承可以解决<font color=HotPink>**数据冗余**</font>的问题
+	- 虚继承<font color=CornflowerBlue>使得架构设计可能出现问题
+## lesson54 被遗弃的多重继承(下)
+- 多重继承可能产生多个虚函数表
+> 需要进行<font color=CornflowerBlue>**强制类型转换**</font>时，C++中推荐使用新式类型转换关键字<font color=HotPink>**dynamic_cast**</font>
+
+###  工程开发中的“多重继承”方式：
+- <font color=CornflowerBlue>**单继承某个类**</font>+<font color=CornflowerBlue>**实现多个接口**</font>
+### 一些有用的工程建议
+- 先继承自<font color=CornflowerBlue>**一个父类**</font>，然后实现<font color=HotPink>**多个接口**</font>
+- 父类中提供<font color=CornflowerBlue>**equal()**</font>成员函数
+- equal()成员函数用于<font color=HotPink>**判断指针是否指向当前对象**</font>
+- 与<font color=HotPink>**多重继承**</font>相关的强制类型转换用<font color=CornflowerBlue>**dynamic_cast**</font>
+### 小结
+- 多继承中可能出现<font color=CornflowerBlue>**多个虚函数表指针**</font>
+- 与<font color=HotPink>**多重继承**</font>相关的强制类型转换用<font color=CornflowerBlue>**dynamic_cast**</font>完成
+- 工程开发中采用<font color=CornflowerBlue>**单继承多接口**</font>的方式使用多继承
+- 父类提供成员函数用于<font color=HotPink>**判断指针是否指向当前对象**</font>
+## lesson55 经典问题解析
+> <font color=CornflowerBlue>**new**</font>和<font color=HotPink>**malloc**</font>的区别是什么？
+
+- <font color=CornflowerBlue>**new**</font>关键字是<font color=CornflowerBlue>**C++的一部分**</font>
+- <font color=HotPink>**malloc**</font>是由C库提供的函数
+- <font color=CornflowerBlue>**new**</font>以具体<font color=CornflowerBlue>**类型为单位**</font>进行内存分配
+- <font color=HotPink>**malloc**</font>以字节为单位进行内存分配
+- <font color=CornflowerBlue>**new**</font>在申请内存空间是可进行<font color=CornflowerBlue>**初始化**</font>
+- <font color=HotPink>**malloc**</font>仅根据需要申请定量的内存空间
+
+> <font color=CornflowerBlue>**delete**</font>和<font color=HotPink>**free**</font>的区别是什么？
+
+- delete在<font color=CornflowerBlue>**所有C++编译器中都被支持**</font>
+- free在某些系统开发中是不能调用
+- delete能够<font color=CornflowerBlue>**触发析构函数**</font>的调用
+- free仅归还之前分配的内存空间
+- <font color=CornflowerBlue>**对象的销毁只能使用delete**</font>
+- free<font color=HotPink>**不适合面向对象开发**</font>
+
+> <font color=CornflowerBlue>**构造函数**</font>是否可以成为<font color=CornflowerBlue>**new**</font>虚函数?
+
+- 构造函数<font color=Chocolate>**不可能**</font>成为虚函数=<font color=MediumOrchid>**在构造函数执行结束后,**</font>虚函数表指针才会被正确的初始化
+> <font color=HotPink>**析构函数**</font>是否可以成为<font color=HotPink>**虚函数**</font>
+
+- 析构函数<font color=CornflowerBlue>**可以成为虚函数**</font>=建议在射击类时<font color=Chocolate>**将析构函数声明为虚函数**</font>
+
+> 构造函数<font color=CornflowerBlue>**不可能**</font>发生多态行为
+
+- <font color=Chocolate>**在构造函数执行时**</font>，虚函数表指针未被正确初始化
+
+> 析构函数中<font color=HotPink>**不可能**</font>发生多态行为
+
+<font color=Chocolate>**在析构函数执行时**</font>，虚函数表指针已经被摧毁
+
+### 构造函数和析构函数中<font color=CornflowerBlue>**不能发生多态行为**</font>，<font color=HotPink>**只调用当前类中定义的函数版本**</font>！！
+### 关于继承中的强制类型转换
+- <font color=CornflowerBlue>**dynamic_cast**</font>是与<font color=HotPink>**继承相关**</font>的类型转换关键字
+- <font color=CornflowerBlue>**dynamic_cast**</font>要求相关的类中<font color=HotPink>**必须有虚函数**</font>
+- 用于有直接或者间接<font color=CornflowerBlue>**继承关系**</font>的<font color=Chocolate>**指针**</font>(<font color=MediumOrchid>**引用**</font>)之间
+- 指针：
+	- 转换成功：<font color=CornflowerBlue>**得到目标类型的指针**</font>
+	- 转换失败：<font color=Chocolate>**得到一个空指针**</font>
+- 引用：
+	- 转换成功：<font color=CornflowerBlue>**得到目标类型的引用**</font>
+	- 转换失败：<font color=Chocolate>**得到一个异常操作信息**</font>
+- 编译器会检查<font color=CornflowerBlue>**dynamic_cast**</font>的使用是否正确
+- 类型转换的<font color=HotPink>**结果只可能在运行阶段才能得到**</font>
+## lesson56 函数模板的概念和意义
+### 定义宏代码块
+- 优点：<font color=Chocolate>**代码复用**</font>，适合所有的类型
+- 缺点：编译器不知道宏的存在，<font color=Chocolate>**缺少类型检查**</font>
+### 定义函数
+- 优点：<font color=MediumOrchid>**真正的函数调用,**</font>编译器对类型进行检查
+- 缺点：根据类型重复定义函数，<font color=MediumOrchid>**无法代码复用**</font>
+### 泛型编程的概念
+- <font color=CornflowerBlue>**不考虑具体数据类型的编程方式**</font>
+- 一种特殊的函数<font color=CornflowerBlue>**可用不同类型进行调用**</font>
+- 看起来和普通函数很类似，区别是<font color=HotPink>**类型可被参数化**</font>
+```c++
+template <typename T>		//template:告诉编译器开始泛型编程 <typename T>:告诉编译器T是一个泛指类型
+void Swap(T& a, T& b) {
+	T t = a;
+	a = b;
+	b = t;
+}
+```
+
+### 函数模板的使用
+- <font color=CornflowerBlue>**自动类型推导调用**</font>
+- <font color=Chocolate>**具体类型显示调用**</font>Swap
+### 小结
+- 函数模板是<font color=CornflowerBlue>**泛型编程**</font>在C++中的应用方式之一
+- 函数模板能够<font color=Chocolate>**根据实参对参数类型进行推导**</font>
+- 函数模板支持<font color=MediumOrchid>**显示的指定参数类型**</font>
+- 函数模板是<font color=HotPink>**C++中重要的代码复用方式**</font>普通成员函数
+## lesson57 深入理解函数模板
+### 函数模板深入理解
+- 编译器从函数模板通过具体类型<font color=CornflowerBlue>**产生不同的函数**</font>
+- 编译器会<font color=HotPink>**对函数模板进行两次编译**</font>
+	- <font color=Chocolate>**对模板代码本身进行编译**</font>
+	- <font color=Chocolate>**对参数替换后的代码进行编译**</font>
+### 注意事项
+- 函数模板本身<font color=CornflowerBlue>**不允许隐式类型转换**</font>
+	- <font color=Chocolate>**自动推导类型时，必须严格匹配**</font>
+	- <font color=Chocolate>**显示类型指定时，能够进行隐式类型转换**</font>
+### 函数模板可以定义<font color=CornflowerBlue>**任意多个不同的类型参数**</font>
+```c++
+template <typename T1, typename T2, typename T3>
+T1 Add(T2 a, T3 b) {
+	return static_cast<T1>(a+b);
+}
+int r = Add<int, float, double>(0.5, 0.8);
+```
+### 对于多参数函数模板
+- <font color=Chocolate>**无法自动**</font>推导返回值类型
+- 可以<font color=HotPink>**从左向右**</font>部分指定类型参数
+- 工程中将<font color=CornflowerBlue>**返回值参数**</font>作为<font color=HotPink>**第一个类型参数**</font>！
+### 函数模板可以向普通函数意义被重载
+- C++编译器<font color=CornflowerBlue>**优先考虑普通函数**</font>
+- 如果函数模板可以产生一个<font color=HotPink>**更好的匹配**</font>，那么选择模板
+- 可以通过<font color=Chocolate>**空模板实参列表**</font>限定编译器只匹配模板
+```c++
+	int r1 = Max(1, 2);
+	double r2 = Max<>(0.5, 0.8);	// 限定编译器只匹配函数模板
+```
+### 小结
+- 函数模板通过具体类型<font color=CornflowerBlue>**产生不同的函数**</font>
+- 函数模板可以定义<font color=Chocolate>**任意多个不同的类型参数**</font>
+- 函数模板中的<font color=MediumOrchid>**返回值必须显式指定**</font>
+- 函数模板可以像普通函数一样被重载
