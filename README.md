@@ -1502,3 +1502,232 @@ int r = Add<int, float, double>(0.5, 0.8);
 - 函数模板可以定义<font color=Chocolate>**任意多个不同的类型参数**</font>
 - 函数模板中的<font color=MediumOrchid>**返回值必须显式指定**</font>
 - 函数模板可以像普通函数一样被重载
+## lesson58 类模板的概念和意义
+### 类模板
+- 一些类主要用于<font color=CornflowerBlue>**存储和组织数据元素**</font>
+- 类中数据组织的方式和数据元素的<font color=HotPink>**具体类型无关**</font>
+- 如：数组类，链表类，Stack类，Queue类，等
+- <font color=Chocolate>**C++中将模板的思想应用于类，使得类的实现不关注数据元素的具体类型，而只关注类所需要实现的功能。**</font>
+### C++中的类模板
+- 以相同的方式处理不同的类型
+- 在类声明前使用<font color=CornflowerBlue>**template**</font>进行标识
+- <typename T>用于说明类中使用的<font color=HotPink>**泛指类型 T**</font>
+```c++
+template <typename T>
+class Operator {
+public:
+	T op(T a, T b);
+};
+```
+### 类模板的应用
+- 只能显示指定具体类型，<font color=HotPink>**无法自动推导**</font>
+- 使用具体类型<Type>定义对象
+-  声明的<font color=CornflowerBlue>**泛指类型**</font><font color=HotPink>**T**</font>可以出现在类模板的任意地方
+- 编译器对类模板的处理方式和函数模板相同
+	- 从类模板通过具体类型<font color=CornflowerBlue>**产生不同的类**</font>
+	- <font color=Chocolate>**在声明的地方对类模板代码本身进行编译**</font>
+	- <font color=Chocolate>**在使用的地方对参数替换后的代码进行编译**</font>
+### 类模板的工程应用
+- 类模板必须在<font color=HotPink>**头文件中定义**</font>
+- 类模板<font color=Chocolate>**不能分开实现在不同的文件中**</font>
+- 类模板<font color=CornflowerBlue>**外部定义的**</font>成员函数需要加上<font color=CornflowerBlue>**模板<>**</font>声明
+### 小结
+- <font color=Green>**泛型编程的思想可以应用于类**</font>
+- 类模板以<font color=CornflowerBlue>**相同的方式处理不同类型的数据**</font>
+- 类模板非常<font color=Chocolate>**适用于**</font>编写<font color=Chocolate>**数据结构**</font>相关的代码
+- 类模板在使用时<font color=HotPink>**只能显示指定类型**</font>
+## lesson59 类模板深度剖析
+### 类模板可以定义<font color=CornflowerBlue>**任意多个不同的类型参数**</font>
+
+### 类模板可以被特化
+- 指定类模板的<font color=CornflowerBlue>**特定实现**</font>
+- <font color=HotPink>**部分类型参数**</font>必须显示指定
+- <font color=Chocolate>**一个类模板**</font>根据类型参数<font color=MediumOrchid>**分开实现类模板**</font>
+```c++
+template <typename T1, typename T2>
+class Test {};
+// 特化
+template <typename T>
+class Test<T, T>{};
+```
+### 类模板的特化类型
+- <font color=HotPink>**部分特化**</font> 用特定规则约束类型参数
+- <font color=CornflowerBlue>**完全特化**</font> 完全显示指定类型参数
+```c++
+template <typename T1, typename T2>
+class Test {};
+// 完全特化
+template <>
+class Test<int, int>{};
+```
+### 类模板特化注意事项
+- 特化只是<font color=CornflowerBlue>**模板的分开实现**</font>
+	- 本质上是同一个类模板
+- 特化类模板的<font color=HotPink>**使用方式是统一的**</font>
+	必须显示指定每一个类型参数
+### 重定义和特化不同
+- <font color=CornflowerBlue>**重定义**</font>
+	- 一个类模板和一个新类(或者两个类模板)
+	- 使用的时候需要<font color=CornflowerBlue>**考虑如何选择的问题**</font>
+- <font color=CornflowerBlue>**特化**</font>
+	- 以统一的方式使用类模板和特化类
+	- 编译器<font color=HotPink>**自动优先选择特化类**</font>
+### 函数模板只支持类型参数完全特化
+```c++
+template <typename T>		// 函数模板定义
+bool Equal(T a, T b) {
+	return a == b;
+}
+template < >				// 函数模板完全特化
+bool Equal<void*>(void* a, void* b) {
+	return a == b;
+}
+```
+### 工程中的建议
+- 当需要重载函数模板时，<font color=CornflowerBlue>**优先考虑使用模板特化**</font>
+- <font color=HotPink>**当模板特化无法满足需求**</font>，再使用函数重载！！！
+### 小结
+- 类模板可以定义<font color=CornflowerBlue>**任意多个不同的类型参数**</font>
+- 类模板可以被<font color=Chocolate>**部分特化**</font>和<font color=MediumOrchid>**完全特化**</font>
+- 特化的本质是<font color=CornflowerBlue>**模板的分开实现**</font>
+- 函数模板只支持完全特化
+- 工程中使用<font color=HotPink>**模板特化代替类(函数)重定义**</font>
+## lesson60 数组类模板
+### 模板参数可以是数值型参数(非类型参数)
+```c++
+template <typename T, int N>
+void func() {
+	T a[N];		// 使用模板参数定义局部数组
+}
+```
+### 数值型模板参数的限制
+- <font color=Chocolate>**变量**</font>不能作为模板参数
+- <font color=Chocolate>**浮点数**</font>不能作为模板参数
+- <font color=Chocolate>**类对象**</font>不能作为模板参数
+> 本质：
+> 模板参数是<font color=CornflowerBlue>**在编译阶段被处理**</font>的单元，因此，<font color=HotPink>**在编译阶段必须准确无误的唯一确定**</font>
+
+### 小结
+- 模板参数可以是<font color=CornflowerBlue>**数值型参数**</font>
+- 数值型模板参数<font color=HotPink>**必须在编译期间唯一确定**</font>
+- <font color=Chocolate>**数组类模板**</font>是基于数值型模板参数实现的
+- 数组类模板是简易的<font color=Chocolate>**线性表数据结构**</font>
+## lesson61 智能指针
+### 智能指针的意义
+- 现代C++开发库中<font color=HotPink>**最重要的类模板之一**</font>
+- C++中<font color=MediumOrchid>**自动内存管理**</font>的主要手段
+- 能够在<font color=CornflowerBlue>**很大程度上**</font>避开内存相关的问题
+### STL中的智能指针<font color=CornflowerBlue>**auto_ptr**</font>
+- <font color=Chocolate>**生命周期结束时**</font>，销毁指向的内存空间
+- 不能指向堆数组，<font color=CornflowerBlue>**只能指向堆对象（变量）**</font>
+- <font color=Green>**一片堆空间只属于一个只能指针对象**</font>
+- 多个智能指针对象<font color=HotPink>**不能指向同一片堆空间**</font>
+## lesson62 单例类模板
+### 在架构设计时，某些类在整个系统生命期中<font color=CornflowerBlue>**最多只能有一个对象存在(Single Instance).**</font>
+- 要控制类的对象数目，<font color=CornflowerBlue>**必须对外隐藏构造函数**</font>
+	- 将构造函数的访问属性设置为private
+	- 定义instance并初始化为NULL
+	- 当需要使用对象时，访问Instance的值
+- <font color=CornflowerBlue>**将单例模式相关的代码抽取出来**</font>，开发单例类模板。当需要单例类时，直接使用单例类模板。
+### 小结
+- 单例模式是开发中<font color=CornflowerBlue>**最常用的设计模式之一**</font>
+- 单例模式的应用使得<font color=HotPink>**一个类最多只有一个对象**</font>
+- <font color=Green>**可以将单例模式相关的代码抽象成类模板**</font>
+- 需要使用单例模式的类直接使用<font color=Chocolate>**单例模板**</font>
+## lesson63 C语异常处理
+### 异常的概念
+- 程序在运行过程中可能产生异常
+- <font color=Chocolate>**异常（Exception）**</font>与<font color=MediumOrchid>**Bug的区别**</font>
+- <font color=Green>**异常时程序运行时可预料的执行分支**</font>
+- <font color=HotPink>**Bug时程序中的错误**</font>，是不被预期的运行方式
+### 异常(Exception)和Bug的对比：
+- 异常
+	- <font color=CornflowerBlue>**运行时产生除0的情况**</font>
+	- <font color=CornflowerBlue>**需要打开的外部文件不存在**</font>
+	- <font color=CornflowerBlue>**数组访问时越界**</font>
+- Bug
+	- <font color=HotPink>**使用野指针**</font>
+	- <font color=HotPink>**堆数组使用结束后未释放**</font>
+	- <font color=HotPink>**选择排序无法处理长度为0的数组**</font>
+## lesson64 C++中的异常处理(上)
+### C++内置了异常处理的语法元素 try... catch...
+- <font color=CornflowerBlue>**try**</font>语句处理正常代码逻辑
+- <font color=CornflowerBlue>**catch**</font>语句处理异常情况
+- <font color=CornflowerBlue>**try**</font>语句中的异常由对应的<font color=CornflowerBlue>**catch**</font>语句处理
+```c++
+try {
+	double r = divide(1, 0);
+}catch(...) {
+	cout << "Divided by zero..." << endl;
+}
+```
+### C++异常处理分析
+- <font color=CornflowerBlue>**throw**</font>抛出的异常必须被<font color=CornflowerBlue>**catch**</font>处理
+	- 当前函数<font color=CornflowerBlue>**能够处理异常**</font>，程序继续往下执行
+	- 当前函数<font color=HotPink>**无法处理异常**</font>，则函数当前函数<font color=HotPink>**停止执行**</font>，并返回
+### 同一个<font color=CornflowerBlue>**try**</font>语句可以跟上多个<font color=CornflowerBlue>**catch**</font>语句
+- <font color=CornflowerBlue>**catch**</font>语句可以定义具体处理的异常类型
+- <font color=MediumOrchid>**Bug的区别**</font>由不同的<font color=CornflowerBlue>**catch**</font>语句负责处理
+- <font color=HotPink>**try**</font>语句中可以抛出任何类型的异常
+- <font color=Chocolate>**catch(...)**</font>用于处理所有的类型的异常
+- 任何异常都只能被捕获（<font color=CornflowerBlue>**catch**</font>）<font color=Chocolate>**一次**</font>
+### 小结
+- C++中直接支持异常处理的概念
+- <font color=CornflowerBlue>**try**</font>...<font color=CornflowerBlue>**catch**</font>...是C++中异常处理的专用语句
+- <font color=CornflowerBlue>**try**</font>语句处理正常代码逻辑，<font color=CornflowerBlue>**catch**</font>语句处理异常情况
+- 同一个<font color=CornflowerBlue>**try**</font>语句可以跟上多个<font color=CornflowerBlue>**catch**</font>语句
+- 异常处理必须严格匹配，<font color=HotPink>**不进行任何的类型转换**</font>
+## lesson65 C++中的异常处理(下)
+### catch语句块中可以抛出异常
+- <font color=CornflowerBlue>**catch**</font>中捕获的异常可以被重新解释后抛出
+- 工程开发中使用<font color=HotPink>**catch**</font>中可以抛出异常的特性，封装一层重新抛出异常，形成统一的异常处理形式<font color=HotPink>**统一异常类型**</font>
+- 异常的类型可以是<font color=CornflowerBlue>**自定义类类型**</font>
+- 对于类类型异常的匹配依旧是<font color=Chocolate>**自上而下严格匹配**</font>
+- <font color=MediumOrchid>**赋值兼容性原则**</font>在异常匹配中依然使用
+- 一般而言
+	- <font color=Chocolate>**匹配子类异常的catch放在上部**</font>
+	- <font color=Chocolate>**匹配夫类异常的catch放在下部**</font>
+- 在工程中会定义<font color=CornflowerBlue>**一系列的异常类**</font>
+- 每个类代表工程中可能出现的一种异常类型
+- <font color=Chocolate>**代码服用时**</font>可能需要<font color=MediumOrchid>**重解释不同的异常类**</font>
+- 在定义catch语句块时<font color=HotPink>**推荐使用引用作为参数**</font>（避免拷贝构造提高程序运行效率）
+### C++中的异常处理
+- C++标准库中提供了实用异常类族
+- 标准库中的异常都是从<font color=CornflowerBlue>**exception**</font>类派生的
+- <font color=CornflowerBlue>**exception**</font>类有两个主要的分支
+	- <font color=Chocolate>**logic_error**</font>:常用于程序中的可避免逻辑错误
+	- <font color=Chocolate>**runtime_error**</font>:常用于程序中无法避免的恶性错误
+## lesson66 C++中的类型识别
+### 在面向对象中可能出现下面的情况
+- <font color=Chocolate>**基类指针**</font>指向子类对象
+- <font color=MediumOrchid>**基类引用**</font>
+- 静态类型=变量(对象)<font color=CornflowerBlue>**自身的类型**</font>
+- 动态类型=指针(引用)所指向<font color=HotPink>**对象的实际类型**</font>
+```c++
+void test(Base* b) {
+	/* 危险的转换方式 */
+	Derived* d = static_cast<Derived*>(b);
+}
+```
+- 基类指针是否可以强制类型转换为子类指针<font color=HotPink>**取决于动态类型**</font>！
+### 解决方案-利用多态(不好)
+1. 在基类中<font color=CornflowerBlue>**定义虚函数**</font>返回具体的类型信息
+2. 所有的派生类都<font color=HotPink>**必须实现**</font>类型相关的虚函数
+3. 每个类中的类型虚函数都<font color=Chocolate>**需要不同的实现**</font>
+### C++提供了<font color=CornflowerBlue>**typeid**</font>关键字用于获取类型信息
+- <font color=CornflowerBlue>**typeid**</font>关键字返回对应参数的<font color=MediumOrchid>**类型信息**</font>
+- <font color=CornflowerBlue>**typeid**</font>返回一个<font color=Chocolate>**type_info**</font>类对象
+- 当<font color=CornflowerBlue>**typeid**</font>的参数为<font color=Chocolate>**NULL**</font>时将抛出异常
+### typeid的注意事项
+- 当<font color=CornflowerBlue>**参数为类型**</font>时：返回静态类型信息
+- 当<font color=CornflowerBlue>**参数为变量**</font>时：
+	- 不存在虚函数表-返回静态类型信息
+	- <font color=HotPink>**存在虚函数表-返回动态类型信息**</font>
+### 小结
+- C++中有<font color=CornflowerBlue>**静态类型**</font>和<font color=HotPink>**动态类型**</font>的概念
+- 利用<font color=Chocolate>**多态**</font>能够实现对象的<font color=Chocolate>**动态类型识别**</font>
+- <font color=CornflowerBlue>**typeid**</font>是专用于类型识别的关键字
+- <font color=CornflowerBlue>**typeid**</font>能够返回对象的动态类型信息
+## lesson67 略
+## lesson68 略
+## lesson69
