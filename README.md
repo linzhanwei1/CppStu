@@ -1730,4 +1730,156 @@ void test(Base* b) {
 - <font color=CornflowerBlue>**typeid**</font>能够返回对象的动态类型信息
 ## lesson67 略
 ## lesson68 略
-## lesson69
+## lesson69 自定义内存管理
+### 统计对象中某个<font color=CornflowerBlue>**成员变量的访问次数**</font>
+- <font color=CornflowerBlue>**mutable**</font>是为了突破<font color=CornflowerBlue>**const**</font>函数的限制而设计的
+- <font color=CornflowerBlue>**mutable**</font>成员变量将<font color=Chocolate>**永远处于可改变的状态**</font>
+- <font color=CornflowerBlue>**mutable**</font>成员变量的出现<font color=MediumOrchid>**无法保证**</font>状态不变性
+### 被忽略的事实
+- <font color=CornflowerBlue>**new/delete**</font>的本质是C++预定义的<font color=Chocolate>**操作符**</font>
+- C++对这两个操作符做了严格的行为定义
+	- <font color=Chocolate>**new:**</font>
+	1. 获取足够大的内存空间(<font color=CornflowerBlue>**默认为堆空间**</font>)
+	2. 在获取的空间中调用构造函数创建对象
+	- <font color=Chocolate>**delete:**</font>
+	1. 调用析构函数销毁对象
+	2. 归还对象所占用的空间(默认为堆空间)
+### 在C++中能够重载<font color=CornflowerBlue>**new/delete**</font>操作符
+- 全局重载(<font color=HotPink>**new/delete**</font>)
+- 局部重载(<font color=Green>**针对具体类进行重载**</font>)
+### <font color=CornflowerBlue>**new/delete**</font>的重载方式
+```c++
+// static member function
+void* operator new (unsigned int size) {
+	void* ret = null;
+	/* ret point to allocated memory */
+	return ret;
+}
+```
+// static member function
+void operator delete (void *p) {
+	/* free the memory which is pointed by p */
+	free(p)
+}
+### 在指定位置申请内存空间
+- 在类中重载<font color=CornflowerBlue>**new/delete**</font>操作符
+- 在<font color=CornflowerBlue>**new**</font>的操作符重载函数中<font color=Chocolate>**返回指定的地址**</font>
+- 在<font color=CornflowerBlue>**delete**</font>操作符重载中<font color=MediumOrchid>**标记对应的地址可用**</font>
+### <font color=HotPink>**new[]/delete[]**</font>与<font color=CornflowerBlue>**new/delete**</font>完全不同
+- 动态对象数组创建通过 new[]完成
+- 动态对象数组的销毁通过 delete[]完成
+- new[]/delete[]<font color=MediumOrchid>**能够被重载**</font>，进而<font color=Chocolate>**改变内存管理方式**</font>
+### <font color=CornflowerBlue>**new[]/delete[]**</font>的重载方式
+```c++
+// static member function
+void* operator new[] (unsigned int size) {
+	void* ret = null;
+	/* ret point to allocated memory */
+	return ret;
+}
+```
+```c++
+// static member function
+void operator delete[] (void *p) {
+	/* free the memory which is pointed by p */
+	free(p);
+}
+```
+### 注意事项
+- <font color=CornflowerBlue>**new[]**</font>实际需要返回的内存空间<font color=HotPink>**可能**</font>比期望的要多
+- 对象数组占用的内存中<font color=Chocolate>**需要保存数组信息**</font>
+- 数组信息用于确定<font color=Green>**构造函数**</font>和<font color=Green>**析构函数**</font>的调用次数
+## lesson70 展望：未来的学习之路
+## lesson71 异常处理深度解析
+### 如果异常不处理，<font color=Chocolate>**最后会传到哪里？**</font>
+- <font color=MediumOrchid>**如果异常无法被处理**</font>，terminate()结束函数会被自动调用
+- <font color=Chocolate>**默认情况下**</font>，terminate()调用库函数abort()终止程序
+- abort()函数使得程序指向异常而<font color=Chocolate>**立刻退出**</font>
+- C++支持替换默认的terminate()函数实现
+### terminate()函数的替换
+- 自定义一个无返回值无参数的函数
+	- 不能抛出异常
+	- 必须以某种方式结束当前程序
+- 调用set_terminate()设置自定义的结束函数
+	- 参数类型为void(\*)()
+	- 返回值为默认的terminate()函数入口地址
+### 如果<font color=Chocolate>**析构函数中抛出异常**</font>会发生什么情况？
+- 如果异常没有被处理，<font color=MediumOrchid>**最后terminate()结束整个程序**</font>
+- terminate()是整个程序<font color=CornflowerBlue>**释放系统资源的最后机会**</font>
+- 结束函数可以自定义，但不能继续抛出异常
+- <font color=Chocolate>**析构函数中不能抛出异常**</font>，可能导致terminate()多次调用
+### 小结
+- <font color=CornflowerBlue>**C++中的函数可以声明异常规格说明**</font>
+- 异常规格说明可以看作<font color=Green>**接口的一部分**</font>
+- 函数抛出的<font color=Chocolate>**异常不在规格说明中**</font>，unexpected()被调用
+- unexpected()中能够再次抛出异常
+	- <font color=CornflowerBlue>**异常能够匹配，恢复程序的执行**</font>
+	- <font color=HotPink>**否则，调用terminate()结束程序**</font>能够返回对象的动态类型信息
+## lesson72 函数的异常规格说明
+### 如何判断一个函数是否会抛出异常，以及抛出那些异常?
+- C++提供语法用于声明函数所抛出的异常
+- <font color=CornflowerBlue>**异常声明**</font>作为函数声明的修饰符，<font color=Chocolate>**写在函数列表后面**</font>
+```c++
+// 可能安排出任何异常
+void func1();
+// 只能抛出的异常类型： char 和 int
+void func2() throw(char, int);
+// 不能抛出任何异常
+void func3() throw();
+```
+### 异常规格说明的意义
+- 提示函数调用者必须<font color=Chocolate>**做好异常处理的准备**</font>
+- 提示函数的维护者<font color=MediumOrchid>**不要抛出其它异常**</font>
+- 异常规格说明是<font color=HotPink>**函数接口的一部分**</font>
+- 函数抛出的<font color=Chocolate>**异常不在规格说明中**</font>，全局<font color=CornflowerBlue>**unexpected()**</font>被调用
+- 默认的unexpected()函数会调用全局的terminate()函数
+- 可以<font color=MediumOrchid>**自定义**</font>函数替换默认的unexpected()函数实现
+- <font color=Chocolate>**注意：**</font>不是所有C++编译器都支持这个标准行为
+### unexpected()函数的替换
+- 自定义一个无返回值无参数的函数
+	- 能够再次抛出异常
+		- 当异常符合出发函数的异常规格说明时，回复程序执行
+		- 否则，调用全局terminate()函数结束程序
+- 调用set_unexpected()设置自定义的异常函数
+	- 参数类型为void(\*)()
+	- 返回值为默认的unexpected()函数入口地址
+
+## lesson73 动态内存申请的结果
+### 动态内存申请一定成功吗？
+- malloc函数申请失败是返回NULL值
+- <font color=CornflowerBlue>**new**</font>关键字申请失败时(<font color=MediumOrchid>**根据编译器不同**</font>)
+- 返回<font color=Chocolate>**NULL**</font>值
+- 抛出<font color=Chocolate>**std::bad_alloc**</font>异常
+### <font color=CornflowerBlue>**new**</font>关键字在C++规范中的<font color=MediumOrchid>**标准行为**</font>
+- 在堆空间申请足够大的内存
+	- <font color=Green>**成功**</font>：
+	1. 在获取的空间中调用构造函数创建对象
+	2. 返回对象的地址
+	- <font color=Chocolate>**失败**</font>
+	1. 抛出std::bad_alloc异常
+### <font color=CornflowerBlue>**new**</font>关键字在C++规范中的<font color=MediumOrchid>**标准行为**</font>
+- new在分配内存时
+	- 如果空间不足，会调用全局的 new_handler()函数
+	- new_handler()函数中<font color=Chocolate>**抛出std::bad_alloc异常**</font>
+- 可以自定义new_handler()函数
+	- 处理默认的<font color=CornflowerBlue>**new**</font>内存分配失败的情况
+### 如何跨编译器统一new的行为，<font color=Chocolate>**提高代码移植性**</font>？
+### 解决方案
+- <font color=Chocolate>**全局范围（不推荐）**</font>
+	- 重新定义new/delete的实现，不抛出任何异常
+	- 自定义new_handler()函数，不抛出任何异常
+- <font color=CornflowerBlue>**类层次范围**</font>
+	- 重载new/delete，不抛出任何异常
+- <font color=HotPink>**单次动态内存分配**</font>
+	- 使用nothrow参数，指明new不抛出异常
+### 实验结论
+- <font color=MediumOrchid>**不是所有的编译器都遵循C++的标准规范**</font>
+- 编译器可能重定义new的实现，并在实现中<font color=Chocolate>**抛出bad_alloc异常**</font>
+- <font color=CornflowerBlue>**编译器的默认实现中**</font>，可能没有设置全局的new_handler()函数
+- 对于移植性要求较高的代码，需要考虑new的具体细节
+### 小结
+- 不同的编译器在动态内存分配上的<font color=HotPink>**实现细节不同**</font>的概念
+- malloc函数在内存申请失败时返回<font color=Chocolate>**NULL**</font>
+- <font color=CornflowerBlue>**new**</font>关键字在内存申请失败时
+	- 可能返回NULL值
+	- 可能抛出bad_alloc异常
